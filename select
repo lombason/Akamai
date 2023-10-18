@@ -1,0 +1,37 @@
+select 
+    case when a.region_count = 1 then "Yes" else "No" end core_smle_region_in_ecor
+
+from
+    (select 
+    distinct upper(n.ecor) ecor, 
+    c.region region, 
+    n.name region_name, 
+    n.aka_network,
+    count(c.region) region_count
+
+from 
+    cbgp_smle_svcip c 
+    join (
+        select 
+            distinct id, 
+            name, 
+            lower(ecor_name) ecor, 
+            aka_network 
+
+        from 
+            netarch.regions
+    ) n on c.region = n.id and c.region = $[region]
+
+    join (
+        select 
+            distinct router_name, 
+            smle 
+
+        from 
+            neteng.router
+    ) r on n.ecor = r.router_name 
+
+where 
+    r.smle = 1
+    ) a 
+ 

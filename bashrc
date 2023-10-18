@@ -1,0 +1,66 @@
+#! /bin/bash
+
+#General Shell Env $VAR
+
+    export TMOUT=0
+    export AUTHGATE_DONTFORCEPROTOCOL=0
+    export AUTHGATE_DONTFORCEPROTOCOL=1
+    export TERM="xterm-256color"                      # getting proper colors
+    export HISTCONTROL=ignoredups:erasedups           # no duplicate entries
+    export PS1="\@ \[\e[33m\] \u@\h:\w$ \[\e[00m\]"
+    export GWSH_REPLICATE_CONF=".gwsh_replicate.conf"
+    export TIME=$(date +%H:%M:%S)
+    export DATE=$(date +%d.%m.%y)
+  
+#Akamaized Shell Env $VAR
+
+    #Perforce
+
+    export P4CONFIG=.perforce
+    export P4PORT='rsh:ssh -2 -a -l p4source -q -x p4.source.akamai.com /bin/true'
+    export P4EDITOR=/usr/bin/vim
+    export P4USER=$USER
+    export PATH=$PATH:/home/$USER/bin:/home/noccsync/nocc/one-off/:/home/noccsync/nocc/sysops-labs/:/home/noccsync/nocc/cso-tools/
+
+#General Shell Customizations
+
+    alias lsa="ls -alth --color=auto"       #Display all contents, sorted colorized
+    alias grep='grep --color=auto'          # Colorize grep output (good for log files)
+    alias egrep='egrep --color=auto'        # Colorize grep output (good for log files)
+    alias fgrep='fgrep --color=auto'        # Colorize grep output (good for log files)
+    alias df='df -h'                        # human-readable sizes
+    alias free='free -m'                    # show sizes in MB
+
+    bind "set completion-ignore-case on"    #ignore upper and lowercase when TAB completion
+
+#Production System Access - MFA 
+    alias gwshi="gwsh --init"
+    alias gwshr="gwsh --init --replicate --replicate_conf ~/.reptargets"
+
+   #SSH to LSGs (CONUS)
+    lsg(){  ssh -2 -A -o ServerAliveInterval=180 "$USER"@lsg-nocc"$1".netmgmt.akamai.com; }
+
+    #SSH to NOCC Gateway
+    ngw(){  gwsh -o ServerAliveInterval=180 noccgrp@noccgw"$1".netmgmt.akamai.com;}
+
+    #SSH to LSGs (OCONUS)
+    isg(){  ssh -2 -A -o ServerAliveInterval=180 "$USER"@lsg-intl"$1".netmgmt.akamai.com;}
+
+#Sourcing and File Creation for CSD Engineer
+
+    [[ ! -f ~/.reptargets ]]; printf  "lsg-nocc1.netmgmt.akamai.com\nlsg-nocc2.netmgmt.akamai.com\nlsg-nocc3.netmgmt.akamai.com\nlsg-nocc4.netmgmt.akamai.com\nlsg-nocc5.netmgmt.akamai.com\nlsg-nocc6.netmgmt.akamai.com\nlsg-nocc7.netmgmt.akamai.com\nlsg-nocc8.netmgmt.akamai.com\nlsg-nocc9.netmgmt.akamai.com\nlsg-nocc10.netmgmt.akamai.com\n" > ~/.reptargets;
+
+    [[ ! -d ~/pushview ]]; mkdir -p ~/pushview ; echo -e "P4CLIENT=pushview_"$HOSTNAME"_"$USER"\nP4PORT=rsh:ssh -2 -q -a -x -l p4ops p4.ops.akamai.com -i /home/$USER/.ssh /bin/true"> ~/pushview/.perforce;
+
+    [[ ! -d ~/query2prewarm ]]; mkdir -p ~/query2prewarm ; echo "P4CLIENT=query2prewarm_"$USER"_"$HOSTNAME""> ~/query2prewarm/.perforce;
+
+    [[ ! -d ~/cso-tools ]]; mkdir -p ~/cso-tools ; echo "P4CLIENT=$USER"_cso-tools_nocc"$(echo $HOSTNAME | tr -cd [[:digit:]])"> ~/cso-tools/.perforce;
+
+    [[ ! -d ~/acl ]]; create_acl_client 1> /dev/null
+
+    #Personal Workspace
+    # [[ ! -d ~/workspaces ]]; then mkdir ~/workspaces -p; echo "P4CLIENT="$USER"_configuration"> ~/workspaces/.perforce ;fi
+
+    [[ -z $(pgrep -u $LOGNAME ssh-agent) ]]; /usr/bin/ssh-agent 1> /dev/null
+
+                                                         

@@ -1,0 +1,83 @@
+#! /bin/zsh
+
+#Shell Variables
+    export TMOUT=0
+    export AUTHGATE_DONTFORCEPROTOCOL=0
+    export AUTHGATE_DONTFORCEPROTOCOL=1
+    export TERM="xterm-256color"                      # getting proper colors
+    export HISTCONTROL=ignoredups:erasedups           # no duplicate entries
+    export PATH=$PATH:/opt/homebrew:$HOME/.docker/bin
+--
+
+#ALIASES
+    alias lsa="ls -alth --color=auto"
+    alias grep='grep --color=auto'          # Colorize grep output (good for log files)
+    alias egrep='egrep --color=auto'        # Colorize grep output (good for log files)
+    alias fgrep='fgrep --color=auto'        # Colorize grep output (good for log files)
+
+    #Flags added ....
+    alias df='df -h'                          # human-readable sizes
+    alias free='free -m'                      # show sizes in MB
+
+    #monocle 
+    alias monStore="mv ~/.monocle/old/noc.ApplicationStateManager  ~/.monocle/old/noc.ApplicationStateManager.bak; cp -p  ~/.monocle/noc.ApplicationStateManager ~/.monocle/old/noc.ApplicationStateManager"
+
+#Switch to BASH
+    alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
+    alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
+
+#System Processes
+    alias psa="ps auxf"
+    alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+    alias psmem='ps auxf | sort -nr -k 4'
+    alias pscpu='ps auxf | sort -nr -k 3'
+
+
+#Cool FuNction LoLz
+    alias weather="curl v2.wttr.in"
+    alias forecast="curl wttr.in"
+    alias moon="curl wttr.in/Moon"
+
+#Akamaized Functions
+
+#Load Keys
+    [[ -z $(pgrep -u $LOGNAME ssh-agent) ]]; /usr/bin/ssh-agent 1> /dev/null
+
+    alias keys="ssh-add --apple-use-keychain ~/.ssh/internal/jlomba-internal-2023-10-12;ssh-add --apple-use-keychain ~/.ssh/protect/jlomba-protect-2023-10-12; ssh-add --apple-use-keychain ~/.ssh/deployed/jlomba-deployed-2023-10-12;"
+
+    alias gwshi="gwsh --init"
+
+#Engage LSGs (CONUS)
+    lsg(){
+        ssh -2 -A -o HostKeyAlgorithms=+ssh-dss,ssh-dss -o PubkeyAcceptedKeyTypes=+ssh-rsa "$USER"@lsg-nocc"$1".netmgmt.akamai.com;
+}
+
+    shell_login(){                                                                              #Alternate Shells& Gateways
+        case $1 in
+            "kendall01")
+                echo "Logging $USER into shell01.kendall.corp.akamai.com";ssh -A $USER@shell01.kendall.corp.akamai.com;
+                ;;
+            "sanmateo02")
+                echo "Logging $USER into shell01.kendall.corp.akamai.com";ssh -A $USER@shell02.sanmateo.corp.akamai.com;
+                ;;
+            "kendall05")
+                echo "Logging $USER into shell01.kendall.corp.akamai.com";ssh -A $USER@shell05.kendall.corp.akamai.com;
+                ;;
+            "east")
+                echo "Logging $USER into shell01.east.corp.akamai.com";ssh -A $@shell-east.corp.akamai.com;
+                ;;
+            "west")
+                echo "Logging $USER into shell01.west.corp.akamai.com";ssh -A $USER@shell-west.corp.akamai.com;
+                ;;
+            "blr")
+                echo "Logging $USER into shell-blr.corp.akamai.com";ssh -A -2 $USER@shell-blr.corp.akamai.com;
+                ;;
+            "east1")
+                echo "Logging $USER into login.deploy.akamai.com";ssh -A -2 $USER@login.deploy.akamai.com;
+                ;;
+            *)
+                echo "Enter the following shells $1: kendall01, sanmateo02, kendall05, east, west, blr OR east1"
+                ;;
+
+        esac
+}

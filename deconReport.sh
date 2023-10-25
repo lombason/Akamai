@@ -21,7 +21,6 @@ deconReport(){
   echo -e "\\t\tn${cyan}**This script is READ-ONLY; CSD is responsible to acknowledge its output **${clear}\n ";  
   echo -e "\n=======================================================================================\n"
   
-
   profiler $TICKET $TARGETS  #expanded; these are universal requirements of all deconstructions
   disallowCheck $TICKET $TARGETS    #calls the 'disallowCheck'; if OS (-i || -k) is blocked on target machine  
   netCheck $TICKET $TARGETS         #calls the 'netCheck' function to print and update the TICKET; this is internal function tothis procedure
@@ -41,8 +40,7 @@ deconReport(){
   mCHCheck $TICKET $TARGETS; #calls 'mChCheck' checks if region is part of Metro Cache -H
   edgeChecks $TICKET $TARGETS; #calls 'edgeChecks'; determines if region is ESSL/FF and runs the Maprules and SMLE Check
 
-  };
-
+};
 
 profiler(){
   echo -e "\n${magenta}Profiling Targets: ${cyan} maint -d, malt, maka -p, and checking for cameramon roles${clear}\n";
@@ -128,7 +126,7 @@ disallowCheck(){
   [[ -f $TICKET.tix ]]; rm $TICKET.tix;
 };
 
-netCheck(){   #LOCAL USE ONLY
+netCheck(){     #DOES NOT PRINT TO TICKET - LOCAL USE ONLY
     nets=$(agg mega 'select distinct network from  machinedetails where physregion='${TARGETS[@]}''| awk 'NR==3 {print $1}');
 
   case $nets in
@@ -322,14 +320,13 @@ mCHCheck(){
   [[ -f $TICKET.tix ]]; rm $TICKET.tix;
 };
 
-edgeChecks(){
-  #DOES NOT PRINT TO TICKET - LOCAL USE ONLY
+edgeChecks(){            #DOES NOT PRINT TO TICKET - LOCAL USE ONLY
   line=$(agg mega 'select distinct network from  machinedetails where physregion='${TARGETS[@]}''| awk 'NR==3 {print $1}');
 
   case $line in
     "freeflow" | "essl" )
       mapRuleCheck $TICKET $TARGETS;  #calls 'mapRuleCheck' ; ESSL/FF check of Cache -H
-      sMLECheck $TICKET $TARGETS; #calls  'sMLECheck'; are targets part of softMLE
+      sMLEPrint $TICKET $TARGETS; #calls  'sMLECheck'; are targets part of softMLE
       ;;
     *)
       ;;
@@ -362,42 +359,11 @@ mapRuleCheck(){
   [[ -f $TICKET.tix ]]; rm $TICKET.tix;
 };
 
-sMLECheck(){
-  echo -e "${yellow}[Secure MLE Region Check]${clear} \n";
-  agg map 'select case when region=1 then "Yes" else "No" end core_smle_region_in_ecor from (select count(region) region from cbgp_smle_svcip where region='${TARGETS[@]}')' | tee $TICKET.tix;
-  line=$(awk 'NR==3 {print $1}' $TICKET.tix);
-  
-  case $line in
-    "Yes")
-      echo -e "\n${red}[SMLE] DO NOT PROCEED:  Email the requestor; details found in procedure${clear} \n";
-      printf "Send the following email to the requestor:
-      Hi,
-
-      Region $TARGETS in ECOR_ID is an sMLE scheduled for deconstruction. Is this sMLE region part of partial or whole ECOR deconstruction? 
-      
-        - If its a whole ECOR, is it taking place all at once or is it specific to this region?
-
-      Please provide any and all related DPs.
-
-      NIE requested date:
-      $ DATE
-
-      Affected Region:
-      $TARGETS
-
-      Please reply-all to this email with your approval, or call CSD at
-      617-475-5900 if you have any questions." >> $TICKET.tix;
-      update-tix -f -a "[SMLE] DO NOT PROCEED; Email the requestor using this template" -t $TICKET --summary;
-     ;;
-    "No")
-      echo -e "\n${green}SAFE - Please Proceed${clear} \n" ;
-      update-tix -f -a "[SMLE] SAFE - Please Proceed"  -t $TICKET;
-     ;;
-    *)
-      echo -e "\n${red}[SMLE] DO NOT PROCEED; RETURN TO PROCEDURE${clear}\n";
-      update-tix -f -a "[SMLE] DO NOT PROCEED; RETURN TO PROCEDURE" -t $TICKET --summary;
-      ;;
-    esac
+sMLEPrint(){
+  echo -e "${yellow}[SMLE] Visit the URL: https://www.netarch.akamai.com/sql/lranchev/core_smle_region_check_in_ecor?region=$TARGETS  to determine if this is an SMLE Region and escalate accordingly${clear} \n";
+  printf "Go to: \r https://www.netarch.akamai.com/sql/lranchev/core_smle_region_check_in_ecor?region=$TARGETS \r" > $TICKET.tix;
+  update-tix -f -a "[SMLE] ACK this only upon receiving approvals" -t $TICKET --ack;
+ 
   echo -e "\n=======================================================================================\n"
   
   [[ -f $TICKET.tix ]]; rm $TICKET.tix;

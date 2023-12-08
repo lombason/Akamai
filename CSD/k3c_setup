@@ -1,0 +1,29 @@
+#unzip the downloadeded files
+
+#location of you private key
+DEPLOYED_PRIVATE_KEY='~/.ssh/deployed/$USER-deployed'
+
+#location of your kmicert download 
+KMI_LOCATION=
+
+#extract the files
+tar xf kmicerts.$USER.tgz 
+
+#change to the directory
+cd kmicerts.$USER.tgz 
+
+# unpacked is your k3c with your private key
+ssh-keygen -p -N "" -m pem -f $DEPLOYED_PRIVATE_KEY
+
+#re-encrypt the private key using a passphrase of your choice
+openssl rsautl -decrypt -inkey $DEPLOYED_PRIVATE_KEY -in temp_passphrase.txt.enc
+
+# re-encrypt the private key using a passphrase of your choice
+openssl rsa -aes128 < api_cert.key.temp_passphrase > api_cert.key
+
+#destroy the temporary files
+shred -f -u -z api_cert.key.temp_passphrase
+shred -f -u -z temp_passphrase.txt.enc
+
+for i in {1..10} do; rsync -arpPz . $USER@lsg-nocc"$i".netmgmt.akamai.com:/home/$USER/.k3c; done 
+

@@ -1,34 +1,31 @@
 #! /bin/bash
 #Execute and Print Platform Operations Safety Check Requirements for Deconstruction
 deconReport(){
-
   # Color settings
   red='\033[0;31m'
   green='\033[0;32m'
   yellow='\033[0;33m'
-  blue='\033[0;34m'
   magenta='\033[0;35m'
   cyan='\033[0;36m'
   clear='\033[0m'
   
   #Set Required Variables; provided to CSD via Monocle
+  echo -e "\n${red}THIS SCRIPT REQUIRES MFA IN ORDER TO RUN SUCCESSFULLY; DO NOT PROCEED WITHOUT ENTERING MFA${clear}\n";
   if [[  -n $1 ]]; then TICKET=$1; else read -p "Enter the deconstruction ticket: " TICKET; fi
   if [[  -n $2 ]]; then TARGETS=${@:2}; else read -p "Enter the deconstruction targets: " -a TARGETS; fi
 
   #Role Safety Checks ; relative to all Deconstruction
-  
   echo -e "\n\t\t${magenta}*********** $Running Decon Prechecks for given targets: $TARGETS **********${clear}\n"
-  echo -e "\\t\tn${cyan}**This script is READ-ONLY; CSD is responsible to acknowledge its output **${clear}\n ";  
+  echo -e "\\t\t${cyan}**This script is READ-ONLY; CSD is responsible to acknowledge its output **${clear}\n ";  
   echo -e "\n=======================================================================================\n"
-  
+  netCheck $TICKET $TARGETS   #calls the 'netCheck' function to print and update the TICKET; this is internal function tothis procedure
   profiler $TICKET $TARGETS  #expanded; these are universal requirements of all deconstructions
   disallowCheck $TICKET $TARGETS    #calls the 'disallowCheck'; if OS (-i || -k) is blocked on target machine  
-  netCheck $TICKET $TARGETS         #calls the 'netCheck' function to print and update the TICKET; this is internal function tothis procedure
   cacCheck $TICKET $TARGETS; #calls the 'cacCheck' function to print and update the TICKET; these checks are for the CAC role and are required for all deconstructions
   pCHCheck $TICKET $TARGETS; #calls 'pCHCheck'; determines if region is Protectec Cache -H; these checks are for the PCH role and are required for all deconstructions
 
   ### Determines if decon is Partial based on arr=${#TARGETS[@]} being an INTEGER than a Whole Number Value  ;;
-  if [[ ${TARGETS[@]}  =~ '.' ]]; then printf "This is a Partial Deconstruction; Proceed to Monocle to continue \n" -t $TICKET; return ; fi
+  if [[ ${TARGETS[@]}  =~ '.' ]]; then printf "\n Script has determined this is a Partial Deconstruction; Please notify CSD if this is incorrect\n" -t $TICKET; return;  fi
 
   #FULL Deconstruction Safety Checks
   echo -e "\n=======================================================================================\n"
@@ -42,8 +39,45 @@ deconReport(){
 
 };
 
+netCheck(){     #DOES NOT PRINT TO TICKET - LOCAL USE ONLY
+    nets=$(agg mega 'select distinct network from  machinedetails where physregion='$(iptool ${TARGETS[@]} -c | sed "s/([^)]*)//g" | tr ',' ' '| awk '{print $2}'| tail -1)''| awk 'NR==3 {print $1}');
+  case $nets in
+    "ddc")
+      echo -e "\n${red}DDC Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=7057${clear} \n"
+      update-tix -f -a 'DDC Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=7057' -t $TICKET --todo;
+      ;;
+    "brave")
+      echo -e "\n${red}BRAVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2289${clear} \n"
+      update-tix -f -a 'BRAVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2289' -t $TICKET --todo;
+      ;;
+    "cobra")
+      echo -e "\n${red}COBRA Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2513${clear} \n"
+      update-tix -f -a 'COBRA Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2513' -t $TICKET --todo;
+      ;;
+    "ness")
+      echo -e "\n${red}NESS Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=4753${clear} \n"
+      printf "SysOps escalation is required; Get all approvals before reassigning" >> $TICKET.tix;
+      update-tix -f -a 'NESS Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=4753' -t $TICKET --todo;
+      ;;
+    "chive")
+      echo -e "\n${red}CHIVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=3568${clear} \n"
+
+      update-tix -f -a 'CHIVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=3568' -t $TICKET --ack;
+      ;;
+    "essl" | "crypto" | "nevada" | "srip sport")
+      echo -e "\n ${red}Follow Scorch& Blacklist requirements for Secure network https://www.nocc.akamai.com/alertproc/view.cgi?id=4725${clear} \n"
+      printf "DO NOT PROCEED Unless monitored regions(apart from the target region being deconned)  have already undergone deconstruction \nConfirm tickets for affected regions have been submitted. Check with NIE/ Requestor for details \nhttps://www.nocc.akamai.com/essl_camera/index.cgi?region=$TARGETS \n" >> $TICKET.tix;
+      update-tix -f -a 'Scorch& Blacklist required for Secure network https://www.nocc.akamai.com/alertproc/view.cgi?id=4725' -t $TICKET --ack;
+      ;;
+    *)  
+      echo -e "\nNo Special Network Instructions\n"
+      ;;
+  esac 
+  echo -e "\n=======================================================================================\n"
+
+};
+
 profiler(){
-  echo -e "\n${magenta}Profiling Targets: ${cyan} maint -d, malt, maka -p, and checking for cameramon roles${clear}\n";
   #calls the 'maint -d' function to print and update the TICKET
   echo -e "\t\t${yellow}[maint -d] Acknowledge ALL Suspension Requirements${clear}\n";
   maint -d ${TARGETS[@]} --tic $TICKET | tee $TICKET.tix;
@@ -59,48 +93,16 @@ profiler(){
   #Prints tickets found by IP address
   echo -e "\t\t${yellow}[malt] - Acknowledge and link tickets found to deconstruction ticket${clear}\n";
   for ip in $(iptool -i ${TARGETS[@]}) ; do malt $ip; done | tee $TICKET.tix;
-  update-tix -f -a "Match And LINK Open Ticket for given targets"  -t $TICKET;
+  test -s $TICKET.tix &&   update-tix -f -a "[malt] Link any tickets reported for given targets"  -t $TICKET || update-tix -a "[malt] No tickets found for given targets" -d null -t  $TICKET 
   echo -e "\n=======================================================================================\n"
 
   #identifies any cameramon roles
   echo -e "\t\t${yellow}[cameramon] Checking for cameramon roles ${clear} \n";
   iptool ${TARGETS[@]}| grep -i cameramon | tee $TICKET.tix;
-  update-tix -f -a '[CameraMon] Return to Procedure for details.' -t $TICKET --todo;
+  test -s $TICKET.tix &&   update-tix -f -a "[cameramon] Return to procedure for details."  -t $TICKET || update-tix -a "[cameramon] No cameramon roles found" -d null -t  $TICKET 
   echo -e "\n=======================================================================================\n"
 
-  camMonCheck(){
-    #determines network types and checks if camera monitoring check is applicable 
-    line=$(agg mega 'select distinct network from  machinedetails where physregion='${TARGETS[@]}''| awk 'NR==3 {print $1}');
-    case $line in
-    "essl" | "crypto" | "nevada" | "quill" | "ness" | "volta")
-      echo -e "${yellow}[Secure Camera Monitoring Region Check]${clear} \n";
-      agg mega "select value camera_region, stanzaname monitored_region from stanzanotes_postinstall where name = 'camera_region' AND value = '${TARGETS[@]}'" | tee $TICKET.tix;
-      line=$(awk 'NR==3 {print $1}' $TICKET.tix);
-
-      case $line in
-        ${TARGETS[@]})
-          echo -e "\n${red}DO NOT PROCEED: Monitored Regions Found - if no tickets related to monitored_regions found Contact NIE/Requestor ${clear}"
-          printf "DO NOT PROCEED Unless monitored regions have already undergone deconstruction \nConfirm tickets for affected regions have been submitted. Check with NIE/ Requestor for details \nhttps://www.nocc.akamai.com/essl_camera/index.cgi?region=$TARGETS \n" >> $TICKET.tix;
-          update-tix -f -a '[CameraMon Region] DO NOT PROCEED Unless monitored regions have already undergone deconstruction' -t $TICKET --ack;
-          ;;
-        "")
-          echo -e "\n${green} SAFE - Please Proceed${clear} \n";
-          printf "[CameraMon REGION] SAFE - No regions found - Please Proceed \n Secure Camera Page: https://www.nocc.akamai.com/essl_camera/index.cgi?region=$TARGETS"  >> $TICKET.tix;
-          update-tix -f -a "[CameraMon Region] SAFE - Please Proceed" -t $TICKET;
-          ;;
-        *)
-          echo -e "\n${red}[CameraMon Region] DO NOT PROCEED; RETURN TO PROCEDURE${clear}\n";
-          printf "Proceed to Secure Camera Page: \r https://www.nocc.akamai.com/essl_camera/index.cgi?region=$TARGETS \r"  >> $TICKET.tix
-          update-tix -f -a '[CameraMon Region] Proceed to Secure Camera Page for verification: \r https://www.nocc.akamai.com/essl_camera/index.cgi?region=$TARGETS' -t $TICKET --ack;
-          ;;
-      esac
-      [[ -f $TICKET.tix ]]; rm $TICKET.tix; 
-    echo -e "\n=======================================================================================\n"
-    esac
-    };
-  [[ -f $TICKET.tix ]]; rm $TICKET.tix; #removes the temp file
-
-};
+ };
 
 disallowCheck(){
 
@@ -127,7 +129,7 @@ disallowCheck(){
 };
 
 netCheck(){     #DOES NOT PRINT TO TICKET - LOCAL USE ONLY
-    nets=$(agg mega 'select distinct network from  machinedetails where physregion='${TARGETS[@]}''| awk 'NR==3 {print $1}');
+    nets=$(agg mega 'select distinct network from  machinedetails where physregion='$(iptool ${TARGETS[@]} -c | sed "s/([^)]*)//g" | tr ',' ' '| awk '{print $2}'| tail -1)''| awk 'NR==3 {print $1}');
 
   case $nets in
     "ddc")
@@ -226,7 +228,7 @@ camMonCheck(){
     case $line in
       ${TARGETS[@]})
         echo -e "\n${red}DO NOT PROCEED: Monitored Regions Found - if no tickets related to monitored_regions found Contact NIE/Requestor ${clear}"
-        printf "DO NOT PROCEED Unless monitored regions have already undergone deconstruction \nConfirm tickets for affected regions have been submitted. Check with NIE/ Requestor for details \nhttps://www.nocc.akamai.com/essl_camera/index.cgi?region=$TARGETS \n" >> $TICKET.tix;
+        printf "\n DO NOT PROCEED Unless monitored regions have already undergone deconstruction \nConfirm with NIE/Requestor for details, tickets for affected regions.  \nhttps://www.nocc.akamai.com/essl_camera/index.cgi?region=$TARGETS \n" >> $TICKET.tix;
         update-tix -f -a '[CameraMon Region] DO NOT PROCEED Unless monitored regions have already undergone deconstruction' -t $TICKET --ack;
         ;;
       "")
@@ -301,7 +303,7 @@ mCHCheck(){
   case $line in
     ${TARGETS[@]})
       echo   "${red}[Metro Cache-H] VERIFY DATE Requested Date must be 7 days following tickets Creation Date${clear} \n";
-      printf "If the Deconstruction Date is within 7 days of ticket Creation Date; \r -Complete and Send email below to requestor \r -Set ticket Wake Up Date to 8 days following the Creation Date : \r
+      printf "-If the date is in MORE THAN 7 days from now, no actions are needed \r -If the date is in 7 DAYS OR SOONER from now, update the date in ticket Abstract to 8 days from now and send email to deconstruction requestor with the following information: \r
       Hi, \n
       Region $TARGETS scheduled for deconstruction is part of MCH (Metro Cache-H) and is serving important cache-h content. We have delayed region suspension to allowing 1 week to gracefully move the traffic away. If that delay with region suspension is not acceptable, please reply to this email and ask the NOCC team to set the suspension date in the ticket abstract according to your requirements." > $TICKET.tix;
       update-tix -f -a '[Metro Cache-H] Verify Dates; Actions contingent on Ticket Creation date  ' -t $TICKET --todo;
@@ -361,8 +363,18 @@ mapRuleCheck(){
 
 sMLEPrint(){
   echo -e "${yellow}[SMLE] Visit the URL: https://www.netarch.akamai.com/sql/lranchev/core_smle_region_check_in_ecor?region=$TARGETS  to determine if this is an SMLE Region and escalate accordingly${clear} \n";
-  printf "Go to: \r https://www.netarch.akamai.com/sql/lranchev/core_smle_region_check_in_ecor?region=$TARGETS \r" > $TICKET.tix;
-  update-tix -f -a "[SMLE] ACK this only upon receiving approvals" -t $TICKET --ack;
+  printf "NetArch Query: \r https://www.netarch.akamai.com/sql/lranchev/core_smle_region_check_in_ecor?region=$TARGETS 
+  
+  CSD: ACK THIS with the result of the NetArch query at the URL above and proceed
+
+  Take appropriate actions depending on the answer received:
+  
+  A. If the whole ECOR will be deconstructed all at once, you can proceed with this deconstruction 
+
+  B. If the region deconstruction is specific to this region only or a partial-ECOR deconstruction and the ECOR will continue to serve traffic, then please ask the DP requestor to follow the Planning SMLE ECOR/Region Deconstruction Procedure and cancel the deconstruction
+  
+  If there are question return to the Deconstruction Procedure" > $TICKET.tix;
+  update-tix -f -a "[SMLE] ACK this with NetArch Query results and follow the Instructions" -t $TICKET --ack;
  
   echo -e "\n=======================================================================================\n"
   

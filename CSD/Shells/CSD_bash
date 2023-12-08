@@ -60,7 +60,7 @@
 
     #Personal Workspace
     # [[ ! -d ~/workspaces ]]; then mkdir ~/workspaces -p; echo "P4CLIENT="$USER"_configuration"> ~/workspaces/.perforce ;fi
-
+    if [[ ! -S "${SSH_AUTH_SOCK}" ]]; then echo "warn: no forward agent detected ('${SSH_AUTH_SOCK}' is not a socket)"; fi
     [[ -z $(pgrep -u $LOGNAME ssh-agent) ]]; /usr/bin/ssh-agent 1> /dev/null
 
                                                          

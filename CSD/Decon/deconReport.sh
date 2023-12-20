@@ -1,5 +1,6 @@
 #! /bin/bash
 #Execute and Print Platform Operations Safety Check Requirements for Deconstruction
+
 deconReport(){
   # Color settings
   red='\033[0;31m'
@@ -40,41 +41,39 @@ deconReport(){
 };
 
 netCheck(){     #DOES NOT PRINT TO TICKET - LOCAL USE ONLY
-    nets=$(agg mega 'select distinct network from  machinedetails where physregion='$(iptool ${TARGETS[@]} -c | sed "s/([^)]*)//g" | tr ',' ' '| awk '{print $2}'| tail -1)''| awk 'NR==3 {print $1}');
-  case $nets in
+    NETS=$(agg mega 'select distinct network from  machinedetails where physregion='$(iptool ${TARGETS[@]} -c | sed "s/([^)]*)//g" | tr ',' ' '| awk '{print $2}'| tail -1)''| awk 'NR==3 {print $1}'); echo $NETS > $TICKET.tix;
+  case $NETS in
     "ddc")
-      echo -e "\n${red}DDC Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=7057${clear} \n"
-      update-tix -f -a 'DDC Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=7057' -t $TICKET --todo;
+      echo -e "\n${red} [$NETS] Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=7057${clear} \n"
+      update-tix -f -a '['$NETS'] Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=7057' -t $TICKET --todo;
       ;;
     "brave")
-      echo -e "\n${red}BRAVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2289${clear} \n"
-      update-tix -f -a 'BRAVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2289' -t $TICKET --todo;
+      echo -e "\n${red} $NETS Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2289${clear} \n"
+      update-tix -f -a '['$NETS'] Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2289' -t $TICKET --todo;
       ;;
     "cobra")
-      echo -e "\n${red}COBRA Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2513${clear} \n"
-      update-tix -f -a 'COBRA Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2513' -t $TICKET --todo;
+      echo -e "\n${red} $NETS Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2513${clear} \n"
+      update-tix -f -a '['$NETS']Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2513' -t $TICKET --todo;
       ;;
     "ness")
-      echo -e "\n${red}NESS Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=4753${clear} \n"
+      echo -e "\n${red} $NETS Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=4753${clear} \n"
       printf "SysOps escalation is required; Get all approvals before reassigning" >> $TICKET.tix;
-      update-tix -f -a 'NESS Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=4753' -t $TICKET --todo;
+      update-tix -f -a '['$NETS'] Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=4753' -t $TICKET --todo;
       ;;
     "chive")
-      echo -e "\n${red}CHIVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=3568${clear} \n"
-
-      update-tix -f -a 'CHIVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=3568' -t $TICKET --ack;
+      echo -e "\n${red}[$NETS] Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=3568${clear} \n"
+      update-tix -f -a '['$NETS'] Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=3568' -t $TICKET --todo;
       ;;
     "essl" | "crypto" | "nevada" | "srip sport")
-      echo -e "\n ${red}Follow Scorch& Blacklist requirements for Secure network https://www.nocc.akamai.com/alertproc/view.cgi?id=4725${clear} \n"
-      printf "DO NOT PROCEED Unless monitored regions(apart from the target region being deconned)  have already undergone deconstruction \nConfirm tickets for affected regions have been submitted. Check with NIE/ Requestor for details \nhttps://www.nocc.akamai.com/essl_camera/index.cgi?region=$TARGETS \n" >> $TICKET.tix;
-      update-tix -f -a 'Scorch& Blacklist required for Secure network https://www.nocc.akamai.com/alertproc/view.cgi?id=4725' -t $TICKET --ack;
+      echo -e "\n ${red}Follow Scorch& Blacklist requirements for $NETS network https://www.nocc.akamai.com/alertproc/view.cgi?id=4725${clear} \n"
+      update-tix -f -a 'Scorch& Blacklist required for ['$NETS'] network https://www.nocc.akamai.com/alertproc/view.cgi?id=4725' -t $TICKET --todo;
       ;;
     *)  
       echo -e "\nNo Special Network Instructions\n"
       ;;
   esac 
   echo -e "\n=======================================================================================\n"
-
+  [[ -f $TICKET.tix ]]; rm $TICKET.tix;
 };
 
 profiler(){
@@ -101,69 +100,31 @@ profiler(){
   iptool ${TARGETS[@]}| grep -i cameramon | tee $TICKET.tix;
   test -s $TICKET.tix &&   update-tix -f -a "[cameramon] Return to procedure for details."  -t $TICKET || update-tix -a "[cameramon] No cameramon roles found" -d null -t  $TICKET 
   echo -e "\n=======================================================================================\n"
+  [[ -f $TICKET.tix ]]; rm $TICKET.tix;
 
- };
+};
 
 disallowCheck(){
 
   echo -e "\t\t${yellow}[Disallow Check]${clear} \n";
   erc ${TARGETS[@]} "grep -i disallow_osinstall /a/etc/netdeploy.conf" | tee $TICKET.tix;
-  line=$(erc ${TARGETS[@]} "grep -i disallow /a/etc/netdeploy.conf" | grep DISALLOW_OSINSTALL=1 | tail -1 );
-
+  line=$(awk 'NR==3 {print $2}' $TICKET.tix);
   case $line in
     "DISALLOW_OSINSTALL=1")
-      echo -e "\n${red} OS Disallow found, request approval from r https://www.nocc.akamai.com/elist/?mode=home_liaisons ${clear} \n"
-      update-tix -f -a '[DISALLOWED] Request Approval from Network Liason; DDC targets may procced [APPROVAL]' -t $TICKET --todo;
+      echo -e "\n${red} OS Disallow found. Pproval required from Network Liaision https://www.nocc.akamai.com/elist/?mode=home_liaisons ${clear} \n"
+      update-tix -f -a '[DISALLOWED] Request Approval from Network Liason ['$NETS']' -t $TICKET --todo;
       ;;
     "")
-      echo -e "\n${green}[Disallow Check]SAFE - Please Proceed${clear} \n";
+      echo -e "\n${green}[Disallow Check] SAFE - No Disallows Found. No Failures ${clear} \n";
       update-tix -f -a '[Disallow Check]SAFE - Please Proceed' -t $TICKET;
       ;;
     *)
-      echo -e "\n${red}[Disallow Check] DO NOT PROCEED; RETURN TO PROCEDURE${clear} \n";
-      update-tix -f -a '[Disallow Check]DO NOT PROCEED; RETURN TO PROCEDURE' -t $TICKET --ack;
+      echo -e "\n${red}[Disallow] REVIEW OUTPUT; Failure Ientified ${clear} \n";
+      update-tix -f -a '[Disallow] Failure Identified: Parse the output and make determination' -t $TICKET --todo;
       ;;
    esac
   echo -e "\n=======================================================================================\n"
   [[ -f $TICKET.tix ]]; rm $TICKET.tix;
-};
-
-netCheck(){     #DOES NOT PRINT TO TICKET - LOCAL USE ONLY
-    nets=$(agg mega 'select distinct network from  machinedetails where physregion='$(iptool ${TARGETS[@]} -c | sed "s/([^)]*)//g" | tr ',' ' '| awk '{print $2}'| tail -1)''| awk 'NR==3 {print $1}');
-
-  case $nets in
-    "ddc")
-      echo -e "\n${red}DDC Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=7057${clear} \n"
-      update-tix -f -a 'DDC Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=7057' -t $TICKET --todo;
-      ;;
-    "brave")
-      echo -e "\n${red}BRAVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2289${clear} \n"
-      update-tix -f -a 'BRAVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2289' -t $TICKET --todo;
-      ;;
-    "cobra")
-      echo -e "\n${red}COBRA Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2513${clear} \n"
-      update-tix -f -a 'COBRA Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=2513' -t $TICKET --todo;
-      ;;
-    "ness")
-      echo -e "\n${red}NESS Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=4753${clear} \n"
-      printf "SysOps escalation is required; Get all approvals before reassigning" >> $TICKET.tix;
-      update-tix -f -a 'NESS Network; Special Instruction: https://www.nocc.akamai.com/alertproc/view.cgi?id=4753' -t $TICKET --todo;
-      ;;
-    "chive")
-      echo -e "\n${red}CHIVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=3568${clear} \n"
-
-      update-tix -f -a 'CHIVE Network; Special Instruction: https://www.nocc.akamai.com/doc/view.cgi?id=3568' -t $TICKET --needs-ack;
-      ;;
-    "essl" | "crypto" | "nevada" | "srip sport")
-      echo -e "\n ${red}Scorch& Blacklist required for Secure network https://www.nocc.akamai.com/alertproc/view.cgi?id=4725${clear} \n"
-      update-tix -f -a 'Scorch& Blacklist required for Secure network https://www.nocc.akamai.com/alertproc/view.cgi?id=4725' -t $TICKET --todo;
-      ;;
-    *)  
-      echo -e "\nNo Special Network Instructions\n"
-      ;;
-  esac 
-  echo -e "\n=======================================================================================\n"
-
 };
 
 cacCheck(){

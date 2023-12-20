@@ -1,0 +1,14 @@
+after installing monocle
+
+
+Monocle searches your $HOME/.certs directory for a certificate file. It will select the latest dated file
+
+- add .p12 cert path /Users/jlomba/.certs/jlomba-bos-mpfft-20231017.p12
+If you do not have a .p12 cert under $HOME/.certs but you have a .p7b one, use the following command to convert it to a .p12:
+
+To specify the location of the cert file:
+
+/Applications/Monocle.app/Contents/Resources/settings
+
+common.pubcookie_cert_file and 
+common.akamai_cert_file 

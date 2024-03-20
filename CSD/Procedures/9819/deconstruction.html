@@ -1,0 +1,99 @@
+<div class="banner">All Applicable checks have been made and deconstruction is authorized to proceed</div>
+<br>
+<ol>
+    <li>Upon completing ALL safety checks, suspend targets using the given command:</li>
+    <pre><code>maint -s &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; --tic &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt; --pro 4 --rea deconstruction</code></pre>
+
+
+    <li>When the suspension time has passed, stickystop all processes:</li>
+        <div class="note">Before proceeding, ALL Secure targets require 
+        <code><a href="https://www.nocc.akamai.com/alertproc/view.cgi?id=4725">scorching</a></code></div>
+        <pre><code>erc &lt;!--[VAR]IP--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; stickystop akamai -r &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt;</code></pre>
+    
+        <ul>
+            <li><div class="note"> Defined network targets are required to be stopped individually : <code>DNA</code> </div></li>
+            <pre><code>gwsh -l root &lt;!--[VAR]IP--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; '/a/sbin/akamai_run stickystop akamai -r &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt;'</code></pre>
+        </ul>
+    
+    <li>Apply an -ik disallow to prevent the machine from being installed <div class="note">applied in the case a wipe attempt takes longer than your shift </li>
+        <pre><code>disallow -i -k -r &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt; &lt;!--[VAR]IP--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;</code></pre>
+    
+    <li>Wipe the non-secure machines by following the deconstruction steps:</li><div class="note">Best-effort should  be made to re-os <strong>Non Secure</strong> targets and prevent unintended problems in the future.</div>
+    <pre><code>wax -o --no-prk -t &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt; &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;</code></pre>
+    <ul>
+        <li>For <a href="/alertproc/view.cgi?id=2145">Disk errors</a> tickets, be sure to put deconstructed in the resolution abstract.</li>
+        <li>If <a href="/sme/?g_id=151">NIE</a> brings any 'down' machines up while the decon is in process it will cause down machine alerts to fire for all the other machines, which may prompt people to bring the other machines back up too. Closing all hardware tickets and linking their alerts to the decon ticket helps to prevent this.</li>
+    </ul>
+    
+    <li>Use <strong>wipetool</strong> for Secure roles. If the machines are phase targets, escalate to the <a href="/elist/?mode=home_liaisons">Liaisons for the network</a> to either change the phase targets or to approve wiping a phase target.</li>
+    <div class="note"><strong>NOTE</strong>: Secure machines must be brought back online before wiping. Best-effort should still be made to wipe targets to limit nuke requests.</div>
+    <pre>wipetool -t &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt; &lt;!--[VAR]IP--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;</pre>
+    <ul>
+        <li><strong>For Full Region deconstruction</strong> <code class="note">camera_machine_install_causing_region_blacklisting</code> can be ack'd</li>
+        <li>Wipetool can take up to ~24 hours, <strong>DO NOT REBOOT</strong> unpingable machines until 24 hours has passed since the wipe has started</li>
+    </ul>
+</ol>
+<hr>
+<a href="#handoff" class="next">Continue to Verify & Handoff</a>
+   
+<ul><li><details>
+    <summary style="color:darkblue;font-size: large;">Other Links</summary> 
+    <div class="links">
+        <ul>
+        <li><a href="#background">Return to Top | Background</a>
+        <li><a href="#monocle">Return to Top | Ticket Delegation</a>
+        </ul>
+    </div>
+</details></li></ul>
+
+
+<style> .banner {
+    text-align: center; 
+    font-size:larger; 
+    background-color: darkorange; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+}
+.caution-banner{
+    text-align: center; 
+    font-size:larger; 
+    background-color: red; 
+    color: white; 
+    padding: 4px; 
+    font-weight:bold"
+}
+.note {
+    text-align: center; 
+    width:fit-content;
+    background-color: gainsboro; 
+    color: black; 
+    padding:3px; 
+}
+.note code{
+    background-color:#A7C760; 
+    color: red; 
+    padding: 4px; 
+    font-weight:bold;
+}
+ .next {
+    color:blue; 
+    display: flex; 
+    font-size:20px}
+
+.links {
+    width: fit-content;
+    display: flex;
+    padding-left: 1px;
+    font-size: 14px;
+    width: fit-content;
+        }
+.links a {
+    color: darkblue;
+    width: fit-content;
+    text-align: left;
+    display: flex;
+    padding-left: 1px;
+    }
+    
+</style>    

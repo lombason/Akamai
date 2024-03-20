@@ -1,0 +1,113 @@
+<div style=" text-align: center; font-size:larger; background-color: darkorange; color: black; padding: 4px; font-weight:bold" >Change Safety Deployment is responsible for the maintenance and execution of the steps listed in this procedure </div>
+<div style=" text-align: center; font-size:larger; background-color: salmon; color: black; padding: 4px;" >Perforce access is required to: <code>/home/noccsync/nocc/cso-tools/</code> for scripting</div>
+
+<h4>Automations in use throughout this procedure:</h4>
+<dt>Precheck: deconReport</dt>
+    <li>script determines deconstruction type, network and executes all applicable checks</li>
+    <li>query results will print to terminal and to the given ticket</li>
+    <li style="background-color:#FA5F55">CSD is responsible to take actions as needed, including operational feedback.</li>
+</ol>
+
+<details><summary style="color:darkcyan">How It Works:</summary>
+
+    <ul>
+        <li><strong>deconCheck</strong> uses positional parameters; you may enter the command as seen below:</li>
+        <li><code>deconCheck [TICKET] [TARGETS]...</code></li>
+        <ul>
+            <li><strong>$1</strong> = <code><!--[VAR]TICKET-->$TICKET<!--[ENDVAR]--></code></li>
+            <li><strong>$2</strong> (<code>{@:2}</code>) = <code><!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]--></code></li>
+        </ul>
+        <li><strong>EXAMPLE:</strong></li>
+        <ul>
+            <li>quotations are not required when using positional argument</li>
+            <li>Full Region: <code>deconCheck B-W-DD0TIX 31281</code></li>
+            <li>Partial: <code>deconCheck B-W-DD0TIX 200.14.44.157 200.14.44.158</code></li>
+        </ul>
+    </ul>
+</details>
+
+<dt>Deconstruction:AMP</dt>
+    <li>AMP script determines network and suspends targets </li>
+    <li>Following suspension, remeining deconstruction steps are executed and ticket reassignment</li>
+    <li style="background-color:gainsboro">In the case of failure; resume from the prescribed step as noted in Monocle </li>
+<details>
+    <summary style="color:darkcyan">How It Works:</summary>
+    <ul>
+        <li><strong>deconCheck</strong> uses positional parameters; you may enter the command as seen below:</li>
+        <li><code>deconCheck [TICKET] [TARGETS]...</code></li>
+        <ul>
+            <li><strong>$1</strong> = <code><!--[VAR]TICKET-->$TICKET<!--[ENDVAR]--></code></li>
+            <li><strong>$2</strong> (<code>{@:2}</code>) = <code><!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]--></code></li>
+        </ul>
+        <li><strong>EXAMPLE:</strong></li>
+        <ul>
+            <li>quotations are not required when using positional argument</li>
+            <li>Full Region: <code>deconCheck B-W-DD0TIX 31281</code></li>
+            <li>Partial: <code>deconCheck B-W-DD0TIX 200.14.44.157 200.14.44.158</code></li>
+        </ul>
+    </ul>
+</details>
+<hr>
+    <a class="next: flex; font-size:20px;#universal">Next Step: Universal Safety Checks</a>
+<ul><li>
+<details>
+    <summary style="color:darkblue;font-size: large;">Other Links</summary> 
+    <div class="relative">
+        <ul>
+        <li><a href="#deconstruction">Deconstruction</a>
+        <li><a href="#cancel">Continue to Cancel/ Revert Deconstruction</a>
+
+        </ul>
+    </div>
+</details></li></ul>
+
+<style> 
+.banner {
+    text-align: center; 
+    font-size:larger; 
+    background-color: darkorange; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+}
+.caution-banner{
+    text-align: center; 
+    font-size:larger; 
+    background-color: red; 
+    color: white; 
+    padding: 4px; 
+    font-weight:bold"
+}
+.note {
+    text-align: center; 
+    width:fit-content;
+    background-color: gainsboro; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+
+}
+.note code{
+    background-color:#A7C760; 
+    color: red; 
+    padding: 4px; 
+    font-weight:bold;
+}
+
+
+.links {
+    width: fit-content;
+    display: flex;
+    padding-left: 1px;
+    font-size: 14px;
+    width: fit-content;
+        }
+.links a {
+    color: darkblue;
+    width: fit-content;
+    text-align: left;
+    display: flex;
+    padding-left: 1px;
+    }
+    
+</style>    

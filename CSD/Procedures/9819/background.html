@@ -1,0 +1,79 @@
+<div class="banner">Change Safety Deployment is responsible for the maintenance and execution of the steps listed in this procedure </div>
+<hr>
+<p>This procedure addresses the Platform Operations workflow for <strong>safe removal</strong> of deconstruction targets within a configuration file. <a href="/sme/?g_id=151">NIE</a> has outlined the overall process in their <a href="https://wiki-ro.network.akamai.com/wiki/Deconstructions">wiki</a></p>
+    <ul>
+        <li><strong>NIE is responsible for the return of all hardware.</strong></li>
+            <dd><strong><a href="/sme/?g_id=151">NIE</a>, <a href="/sme/?g_id=51">NetSupport</a> or <a href="/sme/?g_id=665">NetStrategy</a> will generate a deconstruction ticket</strong> and delegate it to CSD for processing. </dd>
+            <dd>This ticket will be used for the entire deconstruction process. If a deconstruction request is received from outside of the <em>Network</em> departments, direct the requestor to <a href="https://docs.akamai.com/networks/requests/">File a Networks CR</a>.</li> </dd>
+            
+        <li><strong>CSD will execute all required safety checks then proceed to safely remove </strong>all targets according to Akamai internal guidelines.
+            <dd>Safe Removal requires all respective Akamai software, secrets and access have been removed from the targets. upon completion <strong>NIE/requestor is notified</strong>, targets can then be physically removed and/or transposed.</li></dd>
+        
+        <li>Upon completion of Safe Removal, <strong>SysOps will proceed to update the config files and delegate </strong> the ticket</li>
+        
+        <li><strong>For Cancellation and Rescheduling</strong> proceed to <a href="#cancel">Cancel a Deconstruction</a>.</li>
+    </ul>
+<hr>
+    <a href style="color:blue; display: flex; font-size:20px;#monocle">Next Step: Monocle Ticket Delegation</a>
+
+<ul><li><details>
+    <summary style="color:darkblue;font-size: large;">Other Links</summary> 
+    <div class="links">
+        <ul>
+            <li><a href="#universal">Deconstruction</a>
+            <li><a href="#automation">CSD Automations</a>
+            <li><a href="#cancel">Cancel/ Revert Deconstruction</a>
+        </ul>
+    </div>
+</details></li></ul>
+
+<style> 
+.banner {
+    text-align: center; 
+    font-size:larger; 
+    background-color: darkorange; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+}
+.caution-banner{
+    text-align: center; 
+    font-size:larger; 
+    background-color: red; 
+    color: white; 
+    padding: 4px; 
+    font-weight:bold"
+}
+.note {
+    text-align: center; 
+    width:fit-content;
+    background-color: gainsboro; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+
+}
+.note code{
+    background-color:#A7C760; 
+    color: red; 
+    padding: 4px; 
+    font-weight:bold;
+}
+
+
+.links {
+    width: fit-content;
+    display: flex;
+    padding-left: 1px;
+    font-size: 14px;
+    width: fit-content;
+        }
+.links a {
+    color: darkblue;
+    width: fit-content;
+    text-align: left;
+    display: flex;
+    padding-left: 1px;
+    }
+    
+</style>   

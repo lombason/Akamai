@@ -1,0 +1,86 @@
+<div class="banner"> Before Proceeding: Confirmation is required from NIE or the requestor. Sysops may need to add targets to config </div>
+<br>
+<ol>
+
+    <li>Remove any potential disallows:</li>
+    <pre>disallow -d -r &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt; &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;</pre>
+    <li>Proceed as follows to restore cancelled targets</li>
+    <ol>
+        <li>Suspend the region:</li>
+        <pre>suspendtool --network $NETWORK --region &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; --ticket &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt;</pre>
+        <li>Reinstall the targets:</li>
+        <pre>wax -o --advance &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; --ticket &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt;</pre>
+        <p><strong>NOTE:</strong> --advance will incremental/kernel the target automagically.</p>
+    </ol>
+    <li>After a successful install be sure that everything is unsuspended as well as unstickystopped.</li>
+    <pre>erc &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; unstickystop akamai -r &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt;</pre>
+    <pre>suspendtool --network $NETWORK --region &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; --ticket &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt; -u</pre>
+    <li>If the deconstruction is to take place at a later date, then a new deconstruction request must be submitted.</li>
+    <li>Set <strong>Resolution Abstract</strong>: "Deconstruction cancelled; Targets restored". CLOSE THE TICKET</li>
+</ol>
+<hr>
+
+<ul><li><details>
+    <summary class="next">Other Links</summary> 
+    <div class="links">
+        <ul>
+        <li><a href="#background">Return to Top | Background</a>
+        <li><a href="#monocle">Return to Top | Ticket Delegation</a>
+        </ul>
+    </div>
+</details></li></ul>
+
+<style> 
+
+.banner {
+    text-align: center; 
+    font-size:larger; 
+    background-color: darkorange; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+}
+.caution-banner{
+    text-align: center; 
+    font-size:larger; 
+    background-color: red; 
+    color: white; 
+    padding: 4px; 
+    font-weight:bold"
+}
+.note {
+    text-align: center; 
+    width:fit-content;
+    background-color: gainsboro; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+
+}
+.note code{
+    background-color:#A7C760; 
+    color: red; 
+    padding: 4px; 
+    font-weight:bold;
+}
+ .next {
+    color:blue; 
+    display: flex; 
+    font-size:20px}
+
+.links {
+    width: fit-content;
+    display: flex;
+    padding-left: 1px;
+    font-size: 14px;
+    width: fit-content;
+        }
+.links a {
+    color: darkblue;
+    width: fit-content;
+    text-align: left;
+    display: flex;
+    padding-left: 1px;
+    }
+    
+</style>    

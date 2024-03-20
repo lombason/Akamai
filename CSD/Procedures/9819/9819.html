@@ -1,0 +1,58 @@
+<p>This procedure addresses the Platform Operations workflow for <strong>safe removal</strong> of deconstruction IPs(<strong>$TARGETS</strong>) within a configuration file. <a href="/sme/?g_id=151">NIE</a> has outlined the overall process in their <a href="https://wiki-ro.network.akamai.com/wiki/Deconstructions">wiki</a></p>
+<div class="floating-banner">
+  <ul>
+    <li><strong><a href="https://www.nocc.akamai.com/elist/?g_id=2395">Change Safety Deployment</a> is responsible</strong> for the maintenance and execution of the steps listed in this procedure.</li>
+  </ul>
+</div>
+
+<dt></dt><h4>Some Highlights</h4>
+<ul>
+     <li><strong>NIE is responsible for the return of all hardware.</strong></li>
+    
+    <dd><strong><a href="/sme/?g_id=151">NIE</a>, <a href="/sme/?g_id=51">NetSupport</a> or <a href="/sme/?g_id=665">NetStrategy</a> will generate a deconstruction ticket</strong> and delegate it to CSD for processing. 
+    </dd>
+    <dd>This ticket will be used for the entire deconstruction process. If a deconstruction request is received from outside of the <em>Network</em> departments, direct the requestor to <a href="https://docs.akamai.com/networks/requests/">File a Networks CR</a>.</li> </dd>
+    
+    
+    <li><strong>CSD will execute all required safety checks then proceed to safely remove </strong>all targets according to Akamai internal guidelines.
+        <dd>Safe Removal requires all respective Akamai software, secrets and access have been removed from the targets. 
+        <dd></dd>Upon safe removal <strong>NIE is notified</strong>, targets can then be physically removed and/or transposed.</li></dd>
+    
+    <li>Upon completion of Safe Removal, <strong>SysOps will proceed to update the config files and delegate </strong> to NIE</li>
+    
+    <li><strong>For Cancellation and Rescheduling</strong> proceed to <a href="#cancel">Cancel a Deconstruction</a>.</li>
+</ul>
+</dt>
+<hr>
+
+<h4><a href="#monocle">Continue to Ticket Intake</a></h4>
+
+<summary>
+    Direct Relative Links
+</summary>
+<ul>
+    <li><a href="#automation">CSD Automations</a>
+    <li><a href="#universal">Universal Safety Checks</a>
+    <li><a href="#cancel">Cancel/ Revert Deconstruction</a>
+</ul>
+
+<style> 
+summary {
+  color: darkorange;
+  cursor: pointer;
+  width: fit-content;
+  text-align: left;
+  font-size: 14px;
+  display: flex;
+  padding-left: 1px;
+}
+details {
+  color: red;
+  cursor: pointer;
+  width: fit-content;
+  text-align: left;
+  font-size: 13px;
+  display: flex;
+  padding-left: 10px;
+}
+</style>    

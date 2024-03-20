@@ -1,0 +1,158 @@
+<!-- FILEPATH: /Users/jlomba/Jason/Akamai/CSD/VR/proc/verify.html -->
+<details open><summary>specificdatelimit</summary>
+    <ol>
+        <li>Most events require a modified loadlimit for an uninterrupted time period. Use <em>specificdatelimit</em> to set it up.</li>
+        <li>Add <strong>1</strong> hour before the start time and <strong>24h</strong> to the end date/time! This is a buffer to account for unexpected extended events. Add it whether creating a new bucket or modifying existing customer bucket, unless explicitly requested otherwise.</li>
+    </ol>
+    <p><strong>Syntax</strong>:<code> specificdatelimit.$bucketname start_date start_time end_date end_time loadlimit</p></code>
+    <p><strong>Date format</strong>:<code> MM/DD/YYYY</code> so that June 12, 2021 would be entered as 06/12/2021.</p>
+    <details class="example">
+        <summary>EXAMPLE</summary>
+
+        <li>If the request is to raise limit to 1560 Gb during an event taking place from "2021-06-13 00:00 UTC To 2021-06-28 00:00 UTC", the <strong>specificdatelimit</strong> should look like:</li>
+            
+            <blockquote><ul><p>specificlimit.microsoftddemea 06/12/2021 23:00 06/29/2021 00:00 1560Gb</p></ul</blockquote>  
+        </details>
+    </details>
+<br>
+
+<details open><summary>specificlimit</summary>
+    <ol>
+        <li>If the request is to set different limits for different time frames within a day, then use <em>specificlimit</em> parameter instead of <em>specificdatelimit</em>.</li>
+        <li><strong>Syntax</strong>: <code>specificlimit.$bucketname weekdays start_time stop_time loadlimit</li></code>
+        <li><strong>Date format</strong>: specificlimit only sees 24 hours so the times need to be <code>00:00 to 23:59</code> 
+            <ul><li>Add multiple entries if needed. (More in <a href="#example">EXAMPLE</a> section).</li></ul>
+        </li>
+    </ol>
+    <details class="example">
+    <summary>EXAMPLE</summary> 
+    <li>Here, we have split the time frame "2300-0600 UTC: 50 Tbps" into 2 entries because a date change is happening here and VR sees 24h clock when using specificlimit. </li>
+
+    <li>For example, if ticket says microsoftddemea should have below limits:</li>
+
+    <blockquote>
+        <ul>
+    <p>1600-2300 UTC: 33 Tbps</p>
+    <p>2300-0600 UTC: 50 Tbps</p>
+    <p>0600-1600 UTC: 35 Tbps</p>
+    </ul>
+    </blockquote>
+    <li>Then entries should be:</li>
+    <blockquote>
+        <ul>
+        
+    <p>specificlimit.microsoftddemea MTWRFSD 00:00 05:59 50Tb</p>
+    <p>specificlimit.microsoftddemea MTWRFSD 06:00 15:59 35Tb</p>
+    <p>specificlimit.microsoftddemea MTWRFSD 16:00 22:59 33Tb</p>
+    <p>specificlimit.microsoftddemea MTWRFSD 23:00 23:59 50Tb</p>
+    </ul>
+    </blockquote>
+
+    <ul><li><strong>NOTE: </strong>All weekdays are covered: MTWRFSD stands for Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday</li></ul>
+</details>
+
+</details>
+
+<br>
+
+<details open><summary>Create a new event ticket</summary>
+    <ol>
+        <li>Check if the requested bucket already exists or not. </li>
+        <li>Make sure you have all the required details from the ticket <code>(bucket name, cpcodes, load limit, allowlist, service type, start date and time, end date and time in UTC)</code>
+            <ul><li>If anything is missing, check back with the requester.</li></ul>
+        <li>Take the lowest <code>specificlimit</code> or <code>specificdatelimit</code> limit value and set that as the loadlimit for the bucket.</li>
+        <ul><li>Continue to REPAIR: Create/Modify Bucket and Push Changes to create the new bucket.</li></ul>
+
+    </ol>
+    <details class="example">
+        <summary>EXAMPLE</summary>
+        <li>Here, we are creating a new bucket for the event skydeevents with a load limit of 700Gb.</li>
+        <ul>Example bucket:</ul>
+        <blockquote>
+            <ul>
+            <p>bucketname skydeevents</p>
+            <p>bucketdenytype.skydeevents threshold</p>
+            <p>cpcodes.skydeevents 531185 947937</p>
+            <p>loadlimit.skydeevents 700Gb</p>
+            <p>specificdatelimit.skydeevents 12/29/2019 00:00 01/02/2020 23:59 700Gb</p>
+            <p>denymethod.skydeevents haship</p>
+            <p>bucketloadtype.skydeevents summed</p>
+            <p>services.skydeevents W</p>
+            <p>creationdate.skydeevents 03/13/2020</p>
+            <p>allowlist.skydeevents VelvetRope-AllW</p>
+            </ul>
+        </blockquote>
+    </details>
+
+
+</details>
+<br>
+<details open><summary>Add Event Limit added to an existing bucket</summary>
+    <ol>
+        <li>Make sure you have the following details: bucketname, load limit for the event, start date and time, end date and time (in UTC)</li>
+        <li>Continue to <a href="#push">REPAIR: Create/Modify Bucket and Push Changes</a> to modify the existing bucket by adding specificdatelimit.</li>
+    </ol>
+    <details class="example">
+        <summary>EXAMPLE</summary>
+        <li>Here, load limit of the bucket hululive will be 8000Gb from 06/02/2020 17:00 to 06/03/2020 07:00, otherwise load limit is 1000Gb.</li>
+        <ul>Example bucket:</ul>
+        <blockquote>
+            <ul>
+            <p>bucketname hululive</p>
+            <p>loadlimit.hululive 1000Gb</p>
+            <p>denymethod.hululive haship</p>
+            <p>bucketloadtype.hululive summed</p>
+            <p>services.hululive W</p>
+            <p>allowlist.hululive VelvetRope-AllW</p>
+            <p>specificdatelimit.hululive 06/02/2020 17:00 06/03/2020 07:00 8000Gb</p>
+            </ul>
+        </blockquote>
+    </details>
+</details>
+<br>
+
+<style>
+
+    details {
+        background-color: #A7C7E7;
+        display: flex;
+        padding-left: 1px;
+        cursor: pointer;
+        edge: 1px solid #333;
+        padding: 3px;
+    }
+ul p{
+    background-color: #A7C760;
+    padding: 1px; 
+    width: fit-content;
+    color: darkblue
+
+}
+    details[open] {
+        border: 1px solid #333;
+        background-color: #E5E4E2;
+        display: flex;
+        padding-left: 1px;
+        cursor: pointer;
+        edge: 1px solid #333;
+        padding: 3px;
+    }
+
+    details[open] summary {
+        display: flex;
+        padding-left: 1px;
+        cursor: pointer;
+        edge: 1px solid #333;
+        padding: 3px;
+        font-weight: bold;
+
+    }
+
+.example[open] {
+    background-color: lightgoldenrodyellow;
+    padding: 1px;
+    width: fit-content;
+    color:black
+}   
+
+</style>

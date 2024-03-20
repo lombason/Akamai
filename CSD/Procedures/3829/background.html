@@ -1,0 +1,11 @@
+<h3>This alert fires when RCMS notices that SysOps has opened a deployment or that the NOCC has completed one.</h3>
+
+<li>8CC Alexandria server does not automatically run the CDP prep step, CDP post cannot be run from 8CC LSGs. <em>This restriction may be removed in the near future.</em></li>
+
+<li>CDP pre and post may not be part of the install checklists on <a href="/glossary/index.cgi?searchentry=rcms">RCMS-enabled</a> networks. </li>
+
+<li>The aggregators have a staged restart between 0 and 120 minutes following the CDP post-push which restarts <code class="note">query</code> on the aggregators and starts pulling data from the region proxies. 
+    <ul><li>This up-to-two-hour window needs to be padded slightly to accommodate removal delays for the associated alerts, which is why the duration of the install ticket is three hours.</li>
+    <li>The message to nocc@ and nocc-install@ is necessary for releases which update the configuration file, since </li></ul>
+
+<li class="note"><strong>NOTE:</strong> in some circumstances the pre-push may use the special flag <code>--push-additionals</code> rather than <code>--pre-push</code>. Look at <a href="https://bugzilla.akamai.com/show_bug.cgi?id=2384553">CR 2384553</a> for a partial explanation for this.</li>

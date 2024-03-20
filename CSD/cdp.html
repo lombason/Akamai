@@ -1,0 +1,76 @@
+<!-- FILEPATH: /Users/jlomba/Jason/Akamai/CSD/3829/repair.html -->
+<div class="caution-banner">Do Not Run CDP Commands on FF/ESSL; Assign the ticket to the PREs</a> and <a href="https://www.nocc.akamai.com/elist/?mode=home_liaisons">contact</a> them.
+
+</div>
+<div><p class="note" style="text-align:center"><b>Note:</b> If this alert is for <strong>CDP pre</strong>: Contact the <a href="https://www.nocc.akamai.com/elist/?mode=home_liaisons">PREs</a> for the network (<code><!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]--></code>) and confirm it is safe to run this procedure.</p>
+</div>
+
+<ol><li>Run the CDP push from <strong>lsg-nocc3</strong> and if unavailable, use <strong>lsg-nocc1</strong>, (or any other LSG that is <em>not</em> in Cambridge.)</li>
+    <pre><code>date ; cdp-push --<!--[VAR]ad_sqc_cdp_push_arg-->$CDP_PUSH_ARG<!--[ENDVAR]--> -r <!--[VAR]ad_sqc_label_num-->$LABEL_NUM<!--[ENDVAR]--> <!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]--> --configcheck-ack ; date | tee <!--[VAR]ticket-->$TICKET<!--[ENDVAR]--> && update-tix -f -a 'CDP push completed' -t <!--[VAR]ticket-->$TICKET<!--[ENDVAR]--></code></pre>
+    </code></pre>
+    </ul>
+<li> If you ran the command in the previous step with the <code>--post-push</code> flag: Paste the following message into the <a href="webexteams://im?space=f68d7ee0-e4f8-11e7-a8d2-ffd193bbc519">nocc-install@</a> via Webex</li>
+
+<blockquote class="email">[<!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]-->] CDP post-push is running; if this release updated the configuration file for the network, you may see "Down Machine" and "Down Region" alerts for this network which fire in the next 30-60 minutes which will clear over the next 2-3 hours. Shift leads should consider opening an install ticket if this occurs, though any alerts that persist three hours from the time the CDP post-push is completed in <!--[VAR]ad_single_linked_ticket-->$TICKET<!--[ENDVAR]--> should be worked as normal, and any associated install ticket(s) should be closed.
+</blockquote>
+<hr>
+<li>
+    
+    
+<details open>
+    <summary style="text-align: center; color:red; font-size:larger; font-weight:bold;display:flex ">Wait 1 Hour for the alert to clear</summary>
+    
+<ul><li>If the command completed successfully, but the alert did not clear, continue</li></ul>
+
+<ul><li>Otherwise, tell RCMS that CDP has been pushed.</li></ul>
+<ul><pre>rcms_tool install-manifest flag-cdp --name <!--[VAR]ad_sqc_install_label_key-->$INSTALL_LABEL<!--[ENDVAR]--> --<!--[VAR]ad_sqc_rcms_tool_arg-->$RCMS_TOOL_ARG<!--[ENDVAR]--></pre>
+
+<ul><li> Send and email to <a href=https://www.nocc.akamai.com/elist/?g_id=660>[rcms-help]</a> and the <!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]--> PREs <a href="https://www.nocc.akamai.com/elist/?mode=home_liaisons"> via email</a> and notify them that you had to run `rcms_tool` manually.  Normally `cdp-push` should run this automatically.</li></ul>
+</ul>
+<style> 
+
+    .caution-banner{
+        text-align: center; 
+        font-size:larger; 
+        background-color: red; 
+        color: white; 
+        padding: 4px; 
+        font-weight:bold"
+    }
+    .note {
+        text-align: center; 
+        width:fit-content;
+        background-color: gainsboro; 
+        color: black; 
+        padding: 4px; 
+    
+    } 
+    details[open] {
+        border: 1px solid #333;
+        background-color: white;
+        display: flex;
+        padding-left: 1px;
+        cursor: pointer;
+        edge: 1px solid #333;
+        padding: 3px;
+    }
+
+    details[open] summary {
+        display: flex;
+        padding-left: 1px;
+        cursor: pointer;
+        edge: 1px solid #333;
+        padding: 3px;
+    }
+
+    .email{
+        background-color:gainsboro; 
+        padding: 2px; 
+        text-align: justify;
+    }
+    details{
+        background-color: gainsboro; 
+        padding: 4px; 
+
+    }
+    </style>   

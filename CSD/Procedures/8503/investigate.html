@@ -1,0 +1,65 @@
+
+
+Most External Requests for Velvet Rope changes will have an associated Salesforce Capacity Request (commonly referred to as a “CapReq”, ID will resemble “F-CPR-99999”) that is provided in the request.
+
+1. The following scenarios **require** an associated Salesforce Capacity Request, which should be referenced in the External Request ticket:
+ 
++ Request to permanently increase a bucket's load limit (excluding shadow buckets)
++ Request to temporarily increase a bucket's load limit due to an event (excluding shadow buckets)
+
+    1. If there is no Salesforce Capacity Request referenced in the ticket, ask the requester to provide one as per the [Capacity Request Guidelines](https://ac.akamai.com/docs/DOC-90173). 
+    1. If the External Request does reference a capacity request:
+        + Find the associated Capacity Request in [SalesForce](https://akamai.lightning.force.com/lightning/r/Report/00O4R0000087w45UAA/view) and confirm it is approved. 
+            * If it has been rejected, do not proceed with the request. 
+            * If the request is event-related and has not been approved/rejected yet, and has been opened with CSD due to the event starting in < 24 hours, consider this an emergency event request and follow [Emergency Event Requests](#emergency)
+        + In the CapReq, look for the section named “Approval Details”
+        + If the CapReq references geo-specific CP Codes, create geo-specific VR buckets based on the approved limits. 
+        + If the CapReq DOES NOT reference geo-specific CP Codes, create a global VR bucket with the aggregate limits. 
+        + If the CapReq is geo-specific (ie: the limit requested and approved in a single geo), create a geo-specific VR bucket.
+    1. Proceed to [Verify the Change](#checks).
+
+
+
+1. The following scenarios **do not require** an associated Salesforce Capacity Request, and no additional approvals are needed to proceed:
+
+     * The request is to add or remove CPcodes from existing bucket (*except for a shadow bucket request*)
+     * The request is to reduce the load limit of a custom bucket
+     * The request is from IAT to remove an associated customer bucket
+     * A shadow and/or reservation bucket modification request made by someone in [Shadow Bucket VR](https://www.nocc.akamai.com/elist/?g_id=2955). Please go directly to [Shadow/Reservation Bucket Changes via External Request](https://www.nocc.akamai.com/alertproc/view.cgi?id=8737#shadowres) and follow the procedure.
+     * The request is to change VR bucket names
+     * The request is from [Dave Hassler](https://contacts.akamai.com/index.cgi?username=dhassler) or one of his subordinates (the Capacity Planning team)
+     * The request is made by someone in [SRIP Service Perf](https://www.nocc.akamai.com/elist/?g_id=253) and is for a  Service 'C' VR bucket
+     * The request is made by, or explicitly approved by, one of the [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803) and is for a `Cloud Wrapper` VR bucket
+     * The request is made by, or explicitly approved by, one of the  [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) and is for a MSL OriginShield bucket (name format: OriginShield_mslo[size]). In this case, proceed to "Move cpcode to new bucket" section of [VelvetRope MSL OriginShield ](https://www.nocc.akamai.com/alertproc/view.cgi?id=9013#increase) procedure.
+     * The request is to rename a bucket.
+   
+ 
+       I. If one of the above criteria is met, proceed to [Verify the Change](#checks).
+       
+       II. Else:
+
+        For __Service Letter 'C' Requests (all SRIP Requests):__
+
+        * If the request is not from a member [SRIP Service Perf](https://www.nocc.akamai.com/elist/?g_id=253):
+        1.  Advise the requester that you are waiting for approval from [SRIP Service Perf (perf-help-srip)](href="mailto:perf-help-srip@akamai.com).
+        2.  Request approval from [SRIP Service Perf (perf-help-srip)](href="mailto:perf-help-srip@akamai.com).
+              * If [SRIP Service Perf](https://www.nocc.akamai.com/elist/?g_id=253) does not approve the change(s): Reject the request.
+              * Else if approval is granted, proceed to [Verify the Change](#checks).
+
+        For __Cloud Wrapper Requests:__
+
+    * If the request is not from a member of [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803):
+        1. Advise the requester that you are waiting for approval from [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803).
+         2.  Request approval from [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803).
+     
+           * If [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803) do not approve the change(s): Reject the request.
+           * Else if approval is granted, proceed to [Verify the Change](#checks).
+           
+        For __MSL OriginShield Requests:__
+
+    * If the request is not from a member of [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) 
+        1. Advise the requester that you are waiting for approval from [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) .
+         2.  Request approval from [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) .
+     
+           * If [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) do not approve the change(s): Reject the request.
+           * Else if approval is granted, proceed to proceed to "Move cpcode to new bucket" section of [VelvetRope MSL OriginShield ](https://www.nocc.akamai.com/alertproc/view.cgi?id=9013#increase) procedure.

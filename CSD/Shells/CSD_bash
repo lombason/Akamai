@@ -63,4 +63,8 @@
     if [[ ! -S "${SSH_AUTH_SOCK}" ]]; then echo "warn: no forward agent detected ('${SSH_AUTH_SOCK}' is not a socket)"; fi
     [[ -z $(pgrep -u $LOGNAME ssh-agent) ]]; /usr/bin/ssh-agent 1> /dev/null
 
+
+#CSD Engineer Specific Functions
+
+rmv_rtr() { agg mega "select 'track-router-maints -d --id' as REMOVE_ID_CMND, id from nocc_router_maintenances where ticket = '$1'" ;}
                                                          

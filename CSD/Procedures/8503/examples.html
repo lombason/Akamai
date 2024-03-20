@@ -1,0 +1,122 @@
+<!-- FILEPATH: /Users/jlomba/Jason/Akamai/CSD/VR/proc/examples.html -->
+<details>
+  <summary>specificdatelimit</summary>
+
+  <li>If the request is to raise limit to 1560 Gb during an event taking place from "2021-06-13 00:00 UTC To 2021-06-28 00:00 UTC", the <strong>specificdatelimit</strong> should look like:</li>
+  <blockquote><ul><p>specificlimit.microsoftddemea 06/12/2021 23:00 06/29/2021 00:00 1560Gb</p></ul</blockquote>  
+</details>
+<br>
+
+<details >
+  <summary>specificlimit</summary> 
+  <li>Here, we have split the time frame "2300-0600 UTC: 50 Tbps" into 2 entries because a date change is happening here and VR sees 24h clock when using specificlimit. </li>
+
+  <li>For example, if ticket says microsoftddemea should have below limits:</li>
+  
+  <blockquote>
+    <ul>
+  <p>1600-2300 UTC: 33 Tbps</p>
+  <p>2300-0600 UTC: 50 Tbps</p>
+  <p>0600-1600 UTC: 35 Tbps</p>
+</ul>
+  </blockquote>
+<li>Then entries should be:</li>
+  <blockquote>
+    <ul>
+      
+  <p>specificlimit.microsoftddemea MTWRFSD 00:00 05:59 50Tb</p>
+  <p>specificlimit.microsoftddemea MTWRFSD 06:00 15:59 35Tb</p>
+  <p>specificlimit.microsoftddemea MTWRFSD 16:00 22:59 33Tb</p>
+  <p>specificlimit.microsoftddemea MTWRFSD 23:00 23:59 50Tb</p>
+  </ul>
+</blockquote>
+
+  <ul><li><strong>NOTE: </strong>All weekdays are covered: MTWRFSD stands for Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday</li></ul>
+</details>
+<br>
+<details >
+  <summary>Create a new event ticket</summary> 
+  <li>Here, we are creating a new bucket for the event skydeevents with a load limit of 700Gb.</li>
+  <ul>Example bucket:</ul>
+  <blockquote>
+    <ul>
+      <p>bucketname skydeevents</p>
+      <p>bucketdenytype.skydeevents threshold</p>
+      <p>cpcodes.skydeevents 531185 947937</p>
+      <p>loadlimit.skydeevents 700Gb</p>
+      <p>specificdatelimit.skydeevents 12/29/2019 00:00 01/02/2020 23:59 700Gb</p>
+      <p>denymethod.skydeevents haship</p>
+      <p>bucketloadtype.skydeevents summed</p>
+      <p>services.skydeevents W</p>
+      <p>creationdate.skydeevents 03/13/2020</p>
+      <p>allowlist.skydeevents VelvetRope-AllW</p>
+
+    </ul>
+  </blockquote>
+  
+</details>
+<br>
+
+<details>
+  <summary>Add Event Limit added to an existing bucket</summary> 
+  <li>Here, load limit of the bucket hululive will be 8000Gb from 06/02/2020 17:00 to 06/03/2020 07:00, otherwise load limit is 1000Gb.</li>
+  <ul>Example bucket:</ul>
+    <blockquote>
+      <ul>
+        <p>bucketname hululive</p>
+        <p>loadlimit.hululive 1000Gb</p>
+        <p>denymethod.hululive haship</p>
+        <p>bucketloadtype.hululive summed</p>
+        <p>services.hululive W</p>
+        <p>allowlist.hululive VelvetRope-AllW</p>
+        <p>specificdatelimit.hululive 06/02/2020 17:00 06/03/2020 07:00 8000Gb</p>
+      </ul>
+    </blockquote>
+   
+
+
+  <li><strong>More Info: </strong><a href="https://collaborate.akamai.com/confluence/display/MAPENG/Bucket+Limit+File+Details">https://collaborate.akamai.com/confluence/display/MAPENG/Bucket+Limit+File+Details</a></li>
+</details>
+  
+
+
+<style>
+
+      details {
+          border: 1px solid #333;
+          background-color: #A7C7E7;
+          display: flex;
+          padding-left: 1px;
+          cursor: pointer;
+          edge: 1px solid #333;
+          padding: 3px;
+      }
+  ul p{
+      background-color: #A7C760;
+      padding: 1px; 
+      width: fit-content;
+      color: darkblue
+
+  }
+      details[open] {
+          border: 1px solid #333;
+          background-color: #E5E4E2;
+          display: flex;
+          padding-left: 1px;
+          cursor: pointer;
+          edge: 1px solid #333;
+          padding: 3px;
+      }
+  
+      details[open] summary {
+          display: flex;
+          padding-left: 1px;
+          cursor: pointer;
+          edge: 1px solid #333;
+          padding: 3px;
+          font-weight: bold;
+
+      }
+
+
+  </style>

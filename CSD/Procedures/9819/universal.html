@@ -1,0 +1,155 @@
+<div style=" text-align: center; font-size:larger; background-color: darkorange; color: black; padding: 4px; font-weight:bold" >Change Safety Deployment is responsible for the maintenance and execution of the steps listed in this procedure </div><div style=" text-align: center; font-size:larger; background-color: rgb(201, 34, 34); color: white; padding: 4px; font-weight:bold" > ALL CHECKS IN THIS SECTION ARE REQUIRED FOR ALL DECONSTRUCTIONS</div>
+<hr>
+<ol>
+    <li>Run the following to Identify deconstruction requirements and special handling for safe removal.</li>
+        <pre>maint -d  &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; --tic &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt; --pro 4 --rea deconstruction</pre>
+        
+        <ul>
+            <li><strong>If maint tool is unavailable, go to <a href="/kahuna/index.cgi">Kahuna</a> to decon_note attributes</strong>. Follow the instructions therein. When you are finished, or if the attribute is not set, continue to the next step. <strong>Save your work.</strong></strong></li>
+        </ul>
+       
+    <li>Check for target availability</li>
+        <pre>maka -p &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;</pre>
+        If the machines are <strong>UNPINGABLE</strong>
+                <ul><li><strong>NON-SECURE</strong> </li>Proceed to  <a href="#wrapUp">Wrap-Up</a> | Step 2.
+                <li><strong>SECURE</strong></li>
+                   Request NIE bring the machines back up; If the machines cannot be brought back up, request NUKE and proceed to  <a href="#wrapUp">Wrap-Up</a> </li>
+                </ul>
+               
+<li>Find and <strong>investigate open tickets</strong> </li>
+    <pre>for ip in $(iptool -i &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;) ; do malt $ip; done</pre>
+        <ul>
+            <li class="note"><strong>NOTE:</strong> Targets may have already been made unserviceable, <strong>these are not blockers,</strong> obtain confirmation of the target status from NIE and proceed</li>
+            <li><strong>DO NOT CLOSE NIE/LOGISTICS TICKETS.</strong></li>
+        </ul>
+<li><strong>Confirm replacement</strong> of camera_mon machines and/or secure monitored before proceeding to deconstruction</li>
+        <ol>
+            <li>Secure Monitoring Region Check</li>
+                <pre><code>agg mega "select value camera_region, stanzaname monitored_region from stanzanotes_postinstall where name = 'camera_region' AND value = '&lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;'"</code></pre>
+            <li>Camera_Mon Role Check</li>
+                <pre>iptool &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; |grep cameramon</pre>
+            <strong>DO NOT Proceed UNLESS</strong> there is confirmation of regions have already undergone deconstruction <strong>OR</strong> are scheduled alongside this deconstruction. <strong>Contact the requestor for more information</strong>.</li>
+        </ol>
+    <li><strong>OS disallows require approval</strong> from <a href="/elist/?mode=home_liaisons">Network Liaisons</a> to remove the requested targets.</li>
+        <pre><code>erc &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; "grep reason /a/etc/netdeploy.conf; echo ''"</code></pre>
+        <ul><li>Upon approval run:<code style="background-color:lightgray">disallow -d &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;</code> 
+        <li>Currently CSD is permitted to disallow DDC deconstruction targets <strong>ONLY</strong></li></ul>
+    
+    <li><strong>CAC region</strong> <div class="note">Query will only work with a REG# or a single IP Address</div></li>
+        <pre><code>makodb  "SELECT regionid is_cac_region FROM MROBJ.MOM_RS_1997 where regionid in (&lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;)"</code></pre>
+        <ul>
+            <li>If the query returns a row, <strong>send approval request, via email, to: dl-map-specialist@akamai.com and CC NIE requester</strong></li>
+            <li>Otherwise, Continue</li>
+        </ul>
+    <li><strong>PCH region</strong><div class="note">Query will only work with a REG# or a single IP Address</div></li>
+        <pre><code>agg mega "select case when region IS NULL THEN '' Else 'YES' END is_this_pch_region from region_use_type where region_use_type='web-default-cache-h' and region=($(iptool &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; -c | sed "s/([^)]*)//g" | tr ',' ' '| awk '{print $2}'| tail -1))"</code></pre>
+        <ul>
+            <li>If query returns YES: <strong>send approval request, via email, to:  ess-internal@akamai.com</strong></li>
+            <li>Otherwise, Continue</li>
+        </ul>
+</ol>
+
+<div style="border: 1px solid #333;background-color:whitesmoke">
+<details open>
+    <summary style="text-align: center; color:red; font-size:larger; font-weight:bold;display:flex ">Special Handling | Upon completion of the outlined steps, CSD is required to perform the Wrap-Up section</summary>
+        <div class="specials">
+        <ul>
+            <li><strong>UNPINGABLE</strong> <strong>config.OTHER</strong>: Proceed to <a href="#wrapup">Wrap-Up</a></li>
+            <li><strong>BRAVE</strong>: Follow <a href="https://www.nocc.akamai.com/doc/view.cgi?id=2289">BRAVE Region Maintenance</a> | <strong>Deconstruction</strong></li>
+            <li><strong>DDC</strong>: <a href="https://www.nocc.akamai.com/alertproc/view.cgi?id=7057">DDC Deconstruction Procedure</a></li>
+            <li><strong>COBRA</strong>:  <a href="https://www.nocc.akamai.com/doc/view.cgi?id=2513">Deconstruction Procedure for Cobra</a></li>
+            <li><strong>NESS</strong>: Proceed to <a href="#wrapup">Wrap-Up</a></li>
+            <ul>
+                <li>SysOps escalation is required; <strong>Get all approvals</strong> before reassigning</li>
+                <li><a href="https://www.nocc.akamai.com/alertproc/view.cgi?id=4753">Ness Scorching Procedure</a></li>
+            </ul>
+            <li><strong>CHIVE</strong> <a href="https://www.nocc.akamai.com/doc/view.cgi?id=3568">CHIVEHOST Deconstruction Procedure</a></li>
+            <li><strong>ESSL, CRYPTO, NEVADA, SRIP SPORT</strong>  require <a href="https://www.nocc.akamai.com/alertproc/view.cgi?id=4725">Scorch and Blacklist</a> | <strong>REPAIR: Scorching</strong></li> 
+        </ul>
+        </div>
+</details>
+</div> 
+
+<hr>
+
+<a href style="color:blue; display: flex; font-size:20px;#contingent">Next Step: Contingent Safety Check</a>
+
+<ul><li><details>
+    <summary class="next">Other Links</summary> 
+    <div class="links">
+        <ul>
+            <li><a href="#automation">CSD Automations</a>
+            <li><a href="#universal">Universal Safety Checks</a>
+            <li><a href="#cancel">Cancel/ Revert Deconstruction</a>
+        </ul>
+    </div>
+</details></li></ul>
+
+
+<style> 
+.specials strong {
+  color: rgb(201, 34, 50);
+
+}
+.specials a {
+  color: darkblue; 
+}
+
+<> 
+.banner {
+    text-align: center; 
+    font-size:larger; 
+    background-color: darkorange; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+}
+.caution-banner{
+    text-align: center; 
+    font-size:larger; 
+    background-color: red; 
+    color: white; 
+    padding: 4px; 
+    font-weight:bold"
+}
+.note {
+    text-align: center; 
+    width:fit-content;
+    background-color: gainsboro; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+
+}
+.note code{
+    background-color:#A7C760; 
+    color: red; 
+    padding: 4px; 
+    font-weight:bold;
+}
+
+.email{
+   background-color:gainsboro"
+}
+
+.next {
+    color:blue; 
+    display: flex; 
+    font-size:20px}
+
+.links {
+    width: fit-content;
+    display: flex;
+    padding-left: 1px;
+    font-size: 14px;
+    width: fit-content;
+        }
+.links a {
+    color: darkblue;
+    width: fit-content;
+    text-align: left;
+    display: flex;
+    padding-left: 1px;
+    }
+    
+</style>    

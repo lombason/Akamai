@@ -1,0 +1,173 @@
+
+<div class="banner">Section applies to all targets that are authorized and ready for completion of safe removal </div>
+
+<hr>
+<ol>
+    <li>
+        Confirm the Akamai software/secrets have been removed from the target machines
+        <ul>
+            <li><strong>Secure</strong> targets contain Akamai secrets located in: <code>ls /a/logs/flags</code></li>
+            <pre><code>erc &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; 'ls /a/logs/flags'</code></pre>
+            <ul>
+                <li>If <strong>wipetool</strong> was used, continue to <a href="https://www.nocc.akamai.com/wipe">www.nocc.akamai.com/wipe</a> or in the terminal run: <code>wipetool -t &lt;!--[VAR]TICKET--&gt;$TICKET&lt;!--[ENDVAR]--&gt; &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; --verify</code></li>
+            </ul>
+            <li><strong>Non-Secure</strong> targets require Akamai software removed</li>
+            <pre><code>erc &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; check akamai</code></pre>
+            <ol>
+                <li>Rerun <strong>malt</strong> for any targets that did not return</li>
+                <pre><code>for ip in $(iptool -i &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt;) ; do malt $ip; done</code></pre>
+            </ol>
+            <li>Targets with open tickets will not require verification <strong>CONTINUE</strong></li>
+        </ul>
+    </li>
+    <li>
+        <strong>ALL</strong> Deconstruction targets require their ssh host keys revoked. (You need secure shift grant to revoke host keys):
+        <pre><code>for ip in `iptool -i &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; | xargs`; do hk_client revoke $ip ; done</code></pre>
+    </li>
+    <li>
+        Send an informational email to the Deconstruction Requestor or <a href="https://whohas.deploy.akamai.com/?whohas_input=<!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]-->&country=&state=">NIE Region Owner</a>
+    </li>
+
+
+
+    <li>Complete the ticket header as follow. 
+        <table class="monocle" >
+            <thead>
+                <tr>
+                    <th>Ticket Field</th>
+                    <th>CSD Input/Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Status</td>
+                    <td> OPEN</td>
+                </tr>
+                <tr>
+                    <td>Priority</td>
+                    <td> Priority 3 <strong>Unless previously set to Priority 1</strong></td>
+                </tr>
+                <tr>
+                    <td>Type</td>
+                    <td> Deconstruction</td>
+                </tr>
+                <tr>
+                    <td>SubType</td>
+                    <td> Deconstruct Partial <em style="color: brown;">(if applicable)</em></td>
+                </tr>
+                <tr >
+                    <td>Wake Up Date</td>
+                    <td>*BLANK*</td>
+                </tr>
+                <tr>
+                    <td>Delegated Owner</td>
+                    <td>Config Queue SYSOPS</td>
+                </tr>
+                <tr>
+                    <td>Update Activity</td>
+                    <td>TODO</td>
+                </tr>
+                <tr>
+                    <td>Abstract</td>
+                    <td>SYSOPS: Please deconstruct IPs in the configuration file</td>
+                </tr>
+            </tbody>
+        </table>
+      </li>
+
+
+</ol>
+
+<hr>
+
+<ul><li><details>
+    <summary style="color:darkblue;font-size: large;">Other Links</summary> 
+    <div class="links">
+        <ul>
+            <li><a href="#automation">CSD Automations</a>
+            <li><a href="#universal">Universal Safety Checks</a>
+        </ul>
+    </div>
+</details></li></ul>
+
+
+<style> 
+.banner {
+    text-align: center; 
+    font-size:larger; 
+    background-color: darkorange; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+}
+.caution-banner{
+    text-align: center; 
+    font-size:larger; 
+    background-color: red; 
+    color: white; 
+    padding: 4px; 
+    font-weight:bold"
+}
+.note {
+    text-align: center; 
+    width:fit-content;
+    background-color: gainsboro; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+
+}
+.note code{
+    background-color:#A7C760; 
+    color: red; 
+    padding: 4px; 
+    font-weight:bold;
+}
+ .next {
+    color:blue; 
+    display: flex; 
+    font-size:20px}
+
+.links {
+    width: fit-content;
+    display: flex;
+    padding-left: 1px;
+    font-size: 14px;
+    width: fit-content;
+        }
+.links a {
+    color: darkblue;
+    width: fit-content;
+    text-align: left;
+    display: flex;
+    padding-left: 1px;
+    }
+    
+ 
+.monocle {
+    border-color:aliceblue;
+    margin: 25px ;
+    font-size: 0.9em;
+    min-width: 400px;
+    box-shadow: 0 0 20px lightslategray;
+    }
+.monocle thead tr {
+    background-color: lightslategray;
+    color: black;
+    text-align: left;
+}
+.monocle th, .monocle tbody td {
+    text-align: center;
+}
+.monocle tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.monocle tbody tr:nth-of-type(even) {
+    background-color: lightgray;
+}
+
+.monocle tbody tr:last-of-type {
+    border-bottom: 2px solid aliceblue;
+}
+</style>    

@@ -1,0 +1,140 @@
+<div class="banner" >The following checks are applicable to Full Region Deconstructions ONLY and execution of the steps listed in this procedure </div>
+
+<hr>
+<ol>
+    <li>
+        <strong>ESN Region</strong>
+        <pre><code>agg mega 'select distinct region from region_use_type_union where region_use_type="staging" and region in (select physregion from machinedetails where machineip not in (select machineip from machinesvc where service="syntaxtest")) and region=<!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]-->'</code></pre><div class="note">Results of this query does not block the deconstruction process</div>
+        <ul><li>If the query returns a row, <strong>send notification email to: cc-infra@akamai.com, esn@akamai.com, tesingh@akamai.com</strong>
+        <ul>
+            <li><strong>INCLUDE</strong> the procedure for updating the ESN/SESN firewall rules notification lists on the Portal and notifying customers of the change are found at: <a href="https://www.nocc.akamai.com/doc/view.cgi?id=3097">https://www.nocc.akamai.com/doc/view.cgi?id=3097</a></li>
+        </ul></code></pre>
+          <li>Otherwise, Continue</li> </ul>
+
+    <li>
+        <strong>SiteShield regions:</strong>
+        <pre><code>makodb 'select region_id from mrom_special_regions a, mrom_special_regions_data b where a.special_region_id = b.id and region_set_id in (215,217,219,222) and region_id=<!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]--> group by region_id order by region_id'</code></pre>
+        <div class="note">Results of this query does not block the deconstruction process</div>
+         <ul><li>If the query returns a row, <strong>send notification email to: siteshield-map-ops@akamai.com</strong> </li>
+        <li>Otherwise, Continue</li></ul>
+    </li>
+    <li>
+        <strong>MCH regions:</strong>
+        <pre><code>agg map "SELECT region FROM rm_region_sets WHERE region_set = 'regionset_slow_deconstruction' AND region=<!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]-->"</code></pre>
+         <ul><li>If the query returns a row, <strong>set wakeup for 1 week from ticket Creation Date</strong></li>
+         <ul><li>Send the following email to requestor:</li></ul>
+        <blockquote style="background-color:gainsboro">
+            <p>Hi,
+            <p>Region &lt;!--[VAR]TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; scheduled for deconstruction is part of MCH (Metro Cache-H) and is serving important cache-h content. We have delayed region suspension to allowing 1 week to gracefully move the traffic away. If that delay with region suspension is not acceptable, please reply to this email and ask the NOCC team to set the suspension date in the ticket abstract according to your requirements.</p>
+        </blockquote>
+        <li>Otherwise, Continue</li>
+    </li></ul>
+    <li>
+        <strong>Map Rules Check</strong>
+        <pre><code>makodb "select region, service, maprule, name, map_group, description from (select mr from MROBJ.MOM_MS_1089) a, (select mapruleid, region from mcm_regionpreferences where timestamp=(select max(timestamp) from mcm_regionpreferences) and (rp_tier=1 or preferencelevel=100) and region in (<!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]-->) ) b, (select mr, service, description from maprules) c, (select maprule, name, map_group from midgress_map_groups) d where a.mr=b.mapruleid and a.mr=c.mr and a.mr=d.maprule order by 1,3"</code></pre><div class="note">Results of this query does not block the deconstruction process</div>
+        <p>If the query returns a row, Replace REGION in this JIRA Filter: <a href="https://track.akamai.com/jira/issues/?jql=project%20in%20%20(%22GSP%20MapTix%22%2C%20%22GSP%20Mapping%20Strategy%22)%20AND%20(%20summary%20~%20r$REGION%20or%20summary%20~%20<!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]-->)">https://track.akamai.com/jira/issues/?jql=project%20in%20%20(%22GSP%20MapTix%22%2C%20%22GSP%20Mapping%20Strategy%22)%20AND%20(%20summary%20~%20r$REGION%20or%20summary%20~%20<!--[VAR]$TARGETS-->$TARGETS<!--[ENDVAR]-->)</a></p>
+        <ul>
+            <li><strong>If no ticket is found, with Map-Ops JIRA Q</strong> for this region for the maps replacement send notification email to requester to follow  "<a href="https://collaborate.akamai.com/confluence/display/EPA/Engaging+with+Mapping+Strategy#EngagingwithMappingStrategy-ShouldIletMappingStrategyknowaboutregiondeconstructions?">Mapping Strategy engagement process for Should I let Mapping Strategy know about region deconstructions?</a>"</li>
+            <li>Otherwise, <strong>Continue.</strong></li>
+        </ul>
+    </li>
+    <li><strong>SMLE Check</strong></li>
+         <ul><li>Identify if this is a core SMLE region in ecor:<br><a href="https://www.netarch.akamai.com/sql/lranchev/core_smle_region_check_in_ecor?region=<!--[VAR]REGION-->$REGION<!--[ENDVAR]-->">https://www.netarch.akamai.com/sql/lranchev/core_smle_region_check_in_ecor?region=<!--[VAR]REGION-->$REGION<!--[ENDVAR]--></a></li>
+            <ul>
+                <li><strong>If it is</strong> a Core sMLE region, Email the requestor:</li>
+                 <blockquote style="background-color:gainsboro">
+                    <p>Hi,</p>
+                    <p>Region &lt;!--[VAR]$TARGETS--&gt;$TARGETS&lt;!--[ENDVAR]--&gt; in &lt;!--[VAR]REGION--&gt;$ECOR_ID&lt;!--[ENDVAR]--&gt; is an sMLE scheduled for deconstruction. CSD would like to know whether this sMLE region part of partial or whole ECOR deconstruction? If so, is it taking place all at once or is it specific to this region? Please provide any and all related DPs.</p>
+                </blockquote>
+            <ul>
+                    <li>If the region deconstruction is specific to this region only OR a partial-ECOR deconstruction and the ECOR will continue to serve traffic, <strong>cancel</strong> the deconstruction</li>
+                    <ul>
+                        <li><strong>This should only be used as a break-glass</strong> If there is an emergency situation where the ecor must continue to remain live but a region in the query above needs to be deconstructed, please consult NetArch to Convert the ecor from SMLE to MLE.</li>
+                    </ul>
+                    <li>If the whole ECOR will be deconstructed all at once, <strong>Continue</strong></li>
+                </ul>
+            </ul>
+            <li>Otherwise, <strong>Continue</strong></li>
+        </ol>
+    </li>
+</ol>
+
+<hr>
+
+<a href style="color:blue;font-size:20px;#deconstruction">Next Step: Deconstruction</a>
+
+<ul><li><details>
+    <summary class="next">Other Links</summary> 
+    <div class="links">
+        <ul>
+            <li><a href="#automation">CSD Automations</a>
+            <li><a href="#universal">Universal Safety Checks</a>
+            <li><a href="#cancel">Cancel/ Revert Deconstruction</a>
+        </ul>
+    </div>
+</details></li></ul>
+
+
+<style> 
+.specials strong {
+  color: rgb(201, 34, 50);
+
+}
+.specials a {
+  color: darkblue;
+}
+.banner {
+    text-align: center; 
+    font-size:larger; 
+    background-color: darkorange; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+}
+
+.caution-banner{
+    text-align: center; 
+    font-size:larger; 
+    background-color: red; 
+    color: white; 
+    padding: 4px; 
+    font-weight:bold"
+}
+.note {
+    text-align: center; 
+    width:fit-content;
+    background-color: gainsboro; 
+    color: black; 
+    padding: 4px; 
+    font-weight:bold;
+
+}
+.note code{
+    background-color:#A7C760; 
+    color: red; 
+    padding: 4px; 
+    font-weight:bold;
+}
+
+.next {
+    color:blue; 
+    display: flex; 
+    font-size:20px}
+
+.links {
+    width: fit-content;
+    display: flex;
+    padding-left: 1px;
+    font-size: 14px;
+    width: fit-content;
+        }
+.links a {
+    color: darkblue;
+    width: fit-content;
+    text-align: left;
+    display: flex;
+    padding-left: 1px;
+    }
+    
+ 
+</style>    

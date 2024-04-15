@@ -1,0 +1,3 @@
+A consequence of the design decisions made for the query2 network is long initial delays when requesting a table. If a table has not been requested within the last 20 minutes, it may take up to 5 minutes before the table becomes available on an aggregator once requested. So to avoid long delays when requesting a table for the first time, we can invalidate (2) above by "prewarming" a query2 machine - permanently requesting specific tables.
+
+*For any questions send an email to query-ops-esc@akamai.com*

@@ -1,65 +1,198 @@
+<ul><li><h3>If the change request has already been rejected, Do Not Proceed</h3></li>
+</ul>
 
 
-Most External Requests for Velvet Rope changes will have an associated Salesforce Capacity Request (commonly referred to as a “CapReq”, ID will resemble “F-CPR-99999”) that is provided in the request.
+<hr>
+        <summary class="allowed">The following requests do not require Salesforce Capacity Requests</summary>
+    
+                        <ul>
+                            <li>Add or remove CPcodes from existing bucket (<em>except for a shadow bucket request</em>)</li>
+                            <li>Reduce the load limit of a custom bucket</li>
+                            <li>IAT request to remove an associated customer bucket</li>
+                            <li>Change VR bucket names</li>
+                            <li>The request is from <a href="https://contacts.akamai.com/index.cgi?username=dhassler">Dave Hassler</a> or one of his Capacity Planning team</li>   
+                        </ul>
+                            </li>
+                            <li>Proceed to <a href="#checks">Verify the Change</a>.</li>
+                        </li>
+                    </ul>
+              
 
-1. The following scenarios **require** an associated Salesforce Capacity Request, which should be referenced in the External Request ticket:
+    <br>
  
-+ Request to permanently increase a bucket's load limit (excluding shadow buckets)
-+ Request to temporarily increase a bucket's load limit due to an event (excluding shadow buckets)
-
-    1. If there is no Salesforce Capacity Request referenced in the ticket, ask the requester to provide one as per the [Capacity Request Guidelines](https://ac.akamai.com/docs/DOC-90173). 
-    1. If the External Request does reference a capacity request:
-        + Find the associated Capacity Request in [SalesForce](https://akamai.lightning.force.com/lightning/r/Report/00O4R0000087w45UAA/view) and confirm it is approved. 
-            * If it has been rejected, do not proceed with the request. 
-            * If the request is event-related and has not been approved/rejected yet, and has been opened with CSD due to the event starting in < 24 hours, consider this an emergency event request and follow [Emergency Event Requests](#emergency)
-        + In the CapReq, look for the section named “Approval Details”
-        + If the CapReq references geo-specific CP Codes, create geo-specific VR buckets based on the approved limits. 
-        + If the CapReq DOES NOT reference geo-specific CP Codes, create a global VR bucket with the aggregate limits. 
-        + If the CapReq is geo-specific (ie: the limit requested and approved in a single geo), create a geo-specific VR bucket.
-    1. Proceed to [Verify the Change](#checks).
-
-
-
-1. The following scenarios **do not require** an associated Salesforce Capacity Request, and no additional approvals are needed to proceed:
-
-     * The request is to add or remove CPcodes from existing bucket (*except for a shadow bucket request*)
-     * The request is to reduce the load limit of a custom bucket
-     * The request is from IAT to remove an associated customer bucket
-     * A shadow and/or reservation bucket modification request made by someone in [Shadow Bucket VR](https://www.nocc.akamai.com/elist/?g_id=2955). Please go directly to [Shadow/Reservation Bucket Changes via External Request](https://www.nocc.akamai.com/alertproc/view.cgi?id=8737#shadowres) and follow the procedure.
-     * The request is to change VR bucket names
-     * The request is from [Dave Hassler](https://contacts.akamai.com/index.cgi?username=dhassler) or one of his subordinates (the Capacity Planning team)
-     * The request is made by someone in [SRIP Service Perf](https://www.nocc.akamai.com/elist/?g_id=253) and is for a  Service 'C' VR bucket
-     * The request is made by, or explicitly approved by, one of the [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803) and is for a `Cloud Wrapper` VR bucket
-     * The request is made by, or explicitly approved by, one of the  [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) and is for a MSL OriginShield bucket (name format: OriginShield_mslo[size]). In this case, proceed to "Move cpcode to new bucket" section of [VelvetRope MSL OriginShield ](https://www.nocc.akamai.com/alertproc/view.cgi?id=9013#increase) procedure.
-     * The request is to rename a bucket.
+        <summary class="required">Bucket Load Limit Increases</summary>
+    
+        <li>Request to permanently increase a bucket's load limit (excluding shadow buckets)</li>
+        <li>Request to temporarily increase a bucket's load limit due to an event (excluding shadow buckets)</li>
+                    <ol>
+                        <li>If there is no Salesforce Capacity Request referenced in the ticket, ask the requester to provide one as per the <a href="https://ac.akamai.com/docs/DOC-90173">Capacity Request Guidelines</a>.</li>
+                        <li>If the External Request does reference a capacity request:
+                                <ul><li>Look for the section named “Approval Details”</li>
+                                    <li>If the CapReq references geo-specific CP Codes, create geo-specific VR buckets based on the approved limits.</li>
+                                    <li>If the CapReq is geo-specific (ie: the limit requested and approved in a single geo), create a geo-specific VR bucket.</li>
+                                    <ul><li>If the CapReq DOES NOT reference geo-specific CP Codes, create a global VR bucket with the aggregate limits.</li></ul>
+                                    </li>
+                               
+                                </ul>
+                            </li>
+                            <li>Proceed to <a href="#checks">Verify the Change</a>.</li>
+                        </li>
+                    </ul>
+                </ol>
+ 
+    
+    <hr>
+        <summary class="required">Event starting in &lt; 24 hours: Emergency Event Requests</summary>
+    <li>You should only be following this section if an external request has been filed for an event-related change and there is < 24 hours until the event starts</li>
+                    <ol>
+                         <li>The requester should still provide the Salesforce Capacity Request in the external request, even if it is not approved yet.</li>
+                        <li>The request should come from someone on IAT (Accounts) or the appropriate SME team</li>
+                        <ul><li>If the requestor is from Akatec, ask them to get IAT involved.</li></ul>
+                        <li>Follow <a href="#event">Event specific VR change using specificdatelimit</a> to determine the format of limit update. From there, you will be directed to available capacity check and config update instructions.
+                        </li>      
+                                </ul>
+                            </li>
+                            <li>Proceed to <a href="#checks">Verify the Change</a>.</li>
+                        </li>
+                    </ul>
+                </ol>
    
- 
-       I. If one of the above criteria is met, proceed to [Verify the Change](#checks).
-       
-       II. Else:
-
-        For __Service Letter 'C' Requests (all SRIP Requests):__
-
-        * If the request is not from a member [SRIP Service Perf](https://www.nocc.akamai.com/elist/?g_id=253):
-        1.  Advise the requester that you are waiting for approval from [SRIP Service Perf (perf-help-srip)](href="mailto:perf-help-srip@akamai.com).
-        2.  Request approval from [SRIP Service Perf (perf-help-srip)](href="mailto:perf-help-srip@akamai.com).
-              * If [SRIP Service Perf](https://www.nocc.akamai.com/elist/?g_id=253) does not approve the change(s): Reject the request.
-              * Else if approval is granted, proceed to [Verify the Change](#checks).
-
-        For __Cloud Wrapper Requests:__
-
-    * If the request is not from a member of [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803):
-        1. Advise the requester that you are waiting for approval from [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803).
-         2.  Request approval from [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803).
      
-           * If [Cloud Wrapper SMEs](https://www.nocc.akamai.com/sme/?g_id=2803) do not approve the change(s): Reject the request.
-           * Else if approval is granted, proceed to [Verify the Change](#checks).
-           
-        For __MSL OriginShield Requests:__
+    <br>
+    <details>
+        <summary>Shadow/Reservation Bucket Changes :</summary> 
+        <li> Request must be made from a member of <a href="https://www.nocc.akamai.com/elist/?g_id=2955">Shadow Bucket VR</a>:</li>
+            <li>Please go directly to <a href="https://www.nocc.akamai.com/alertproc/view.cgi?id=8737#shadowres">Shadow/Reservation Bucket Changes via External Request</a> and follow the procedure.</li>
+                    <ul>
+                    </ul>
+                </ol>
+            </ul>
+        </ul>
+    </details>
+    <br>
+    <details >
+        <summary>Service Letter 'C' Requests (all SRIP Requests):</summary> 
+        <p>If the request is not from a member <a href="https://www.nocc.akamai.com/elist/?g_id=253">SRIP Service Perf</a>:</p>
+            <ol><li>Advise the requester that you are waiting for approval from <strong>SRIP Service Perf</strong>.</li>
+                <li>Request approval from <a href="mailto:perf-help-srip@akamai.com">SRIP Service Perf (perf-help-srip)</a>.</li>
+                    <ul>
+                        <li><strong>IF </strong>SRIP Service Perf SMEs do not approve the change(s): Reject the request.</li>
+                        <li><strong>ELSE </strong>  proceed to <a href="#checks">Verify the Change</a></li>
+                    </ul>
+                </ol>
+            </ul>
+        </ul>
+    </details>
+    <br>
+    <details >
+        <summary>Cloud Wrapper Requests:</summary> 
+        <p>If the request is not from a member of <a href="https://www.nocc.akamai.com/sme/?g_id=2803">Cloud Wrapper SMEs</a>:</p>
+            <ol><li>Advise the requester that you are waiting for approval from <strong>Cloud Wrapper SMEs</strong>.</li>
+                <li>Request approval from <a href="https://www.nocc.akamai.com/sme/?g_id=2803">Cloud Wrapper SMEs</a>.</li>
+                    <ul>
+                        <li><strong>IF </strong> Cloud Wrapper SMEs do not approve the change(s): Reject the request.</li>
+                        <li><strong>ELSE </strong>  proceed to <a href="#checks">Verify the Change</a></li>
+                    </ul>
+                </ol>
+            </ul>
+        </ul>
+    </details>
+    <br>
 
-    * If the request is not from a member of [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) 
-        1. Advise the requester that you are waiting for approval from [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) .
-         2.  Request approval from [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) .
-     
-           * If [MSL SMEs](https://www.nocc.akamai.com/elist/?g_id=3425) do not approve the change(s): Reject the request.
-           * Else if approval is granted, proceed to proceed to "Move cpcode to new bucket" section of [VelvetRope MSL OriginShield ](https://www.nocc.akamai.com/alertproc/view.cgi?id=9013#increase) procedure.
+    <details>
+        <summary>MSL OriginShield Requests:</summary> 
+        <p>If the request is not from a member of <a href="https://www.nocc.akamai.com/elist/?g_id=3425">MSL SMEs</a>:</p>
+            <ol><li>Advise the requester that you are waiting for approval from <strong style="font-weight: bold;">MSL SMEs</strong>.</li>
+                <li>Request approval from <a href="https://www.nocc.akamai.com/elist/?g_id=3425">MSL SMEs</a>.</li>
+                    <ul>
+                        <li><strong>IF </strong> MSL SMEs do not approve the change(s): Reject the request.</li>
+                        <li><strong>ELSE </strong> Proceed to <a href="https://www.nocc.akamai.com/alertproc/view.cgi?id=9013#increase">VelvetRope MSL OriginShield</a> | "Move cpcode to new bucket" section</li>
+                    </ul>
+                </ol>
+    </details>
+    
+
+    <style>
+    h3{
+        color:darkblue;
+    }
+    .banner {
+        text-align: center; 
+        font-size:larger; 
+        background-color: darkorange; 
+        color: black; 
+        padding: 3px; 
+        font-weight:bold;
+    }
+        details {
+          
+            display: flex;
+            padding-left: 1px;
+            cursor: pointer;
+            padding: 3px;
+        }
+    
+        details[open] {
+          
+            background-color: white;
+            display: flex;
+            padding-left: 1px;
+            cursor: pointer;
+            padding: 3px;
+        }
+    
+        details[open] summary {
+            display: flex;
+            padding-left: 1px;
+            cursor: pointer;
+            padding: 3px;
+            
+        }
+    
+        .required {
+            background-color: #e31c3d;
+            display: flex;
+            padding-left: 1px;
+            cursor: pointer;
+            padding: 3px;
+            color:white;
+        }
+    
+        .required[open] summary {
+            background-color: #e31c3d;
+            display: flex;
+            padding-left: 1px;
+            cursor: pointer;
+            padding: 3px;
+        }
+        .allowed {
+            background-color:  #94bfa2;
+            display: flex;
+            padding-left: 1px;
+            cursor: pointer;
+            padding: 3px;
+        }
+    
+        .allowed[open] summary {
+            background-color: #94bfa2;
+            display: flex;
+            padding-left: 1px;
+            cursor: pointer;
+            padding: 3px;
+        }
+
+.links {
+    width: fit-content;
+    display: flex;
+    padding-left: 1px;
+    font-size: 14px;
+    width: fit-content;
+        }
+.links a {
+    color: darkblue;
+    width: fit-content;
+    text-align: left;
+    display: flex;
+    padding-left: 1px;
+    }
+    </style>

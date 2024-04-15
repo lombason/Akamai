@@ -1,0 +1,8 @@
+## "Prewarming" a query2 machine
+
+1. A consequence of the design decisions; query2 has long initial delays when requesting a table.
+2. If a table has not been requested within the last 20 minutes:
+    - Once requested, it may take up to 5 minutes before the table becomes available on an aggregator.
+- To help avoid long delays when requesting a table for the first time, we can invalidate the above by permanently requesting specific tables or **"Prewarming"**.
+
+#### For any questions, send an email to query-ops-esc@akamai.com

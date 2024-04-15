@@ -1,0 +1,41 @@
+<h3>RegionHealthMonitor (RHM) is a component in the mapper network</h3>
+<ul>
+   <li>it actively probes each Akamai region using ICMP, UDP, or TCP \(as appropriate to the target IP\) to determine if the region is healthy.</li>
+    <li>It looks for three different 'connectivity' problems:</li>
+        <ol>
+            <li>excessive loss at the region</li>
+            <li>SRIP or ESSL VIPs that aren't responsive</li>
+            <li>machine or service IPs that are marked as live in the region but don't respond to pings</li>
+        </ol>
+    </li>
+    <li>When it detects any of these problems it takes the entire region out of service.</li>
+    <li>RHM is configured with a number of safeties to prevent it from turning off too much capacity.</li>
+    <ul>   
+    <li>These are organized as regionsets, also known as allowlists.</li>
+    <li>There is one regionset for each important maprule, several that focus on specific geographies, and a few others that are special-purpose.</li>
+    <li>Each regionset has a configured limit as to how much of the set can be taken out of service at the same time. When the limit is violated RHM restores all the regions in the set to service. This is called "rescuing" the bad regions.</li>
+    </ul>
+    <li>Any rescue event is risky because it means Akamai actively using one or more regions believed to have connectivity problems.</li>
+</ul>
+
+
+
+<details>
+<summary>! saved in proc as .md as follows</summary>
+### RegionHealthMonitor (RHM) is a component in the mapper network
+- it actively probes each Akamai region using ICMP, UDP, or TCP (as appropriate to the target IP) to determine if the region is healthy.
+- It looks for three different 'connectivity' problems:
+    - excessive loss at the region
+    - SRIP or ESSL VIPs that aren't responsive
+    - machine or service IPs that are marked as live in the region but don't respond to pings
+- When it detects any of these problems it takes the entire region out of service.
+- RHM is configured with a number of safeties to prevent it from turning off too much capacity.
+    1. These are organized as regionsets, also known as allowlists.
+    2. There is one regionset for each important maprule, several that focus on specific geographies, and a few others that are special-purpose.
+    3. Each regionset has a configured limit as to how much of the set can be taken out of service at the same time. When the limit is violated RHM restores all the regions in the set to service. This is called "rescuing" the bad regions.
+- Any rescue event is risky because it means Akamai actively using one or more regions believed to have connectivity problems.
+
+</details>
+
+
+

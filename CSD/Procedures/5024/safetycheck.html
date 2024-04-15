@@ -1,0 +1,54 @@
+<p>NOTE: There is now a script that can run the next four sections of the procedure. Refer to <a href="#script">INVESTIGATE: Running the script version</a>.</p>
+
+<ol>
+    <li>
+        <p>Run the following query and record the output in the ticket:</p>
+        <pre><code>agg infra "select m.tablename from querymergedtables m, query2_static_config q where m.machineip=q.machineip and q.network='$NETWORK' and m.tablename='$TABLE_NAME' group by m.tablename;"</code></pre>
+        <ul>
+            <li>$TABLE_NAME and $NETWORK come from the request details</li>
+            <li>If the query returns a single row with the tablename, then proceed.</li>
+            <li>If the query returns 0 rows (no result) then <strong>escalate</strong> to <a href="https://www.nocc.akamai.com/elist/?g_id=35">Query2 SMEs</a> via email, stating that this is a prewarm request for a non-merged table that needs assistance from Query2 SMEs. Please CC the requester and include all information such as the information gathered in <a href="#gatherdata">Gather Data</a>, query output, etc. Proceed to next step after email escalation has been sent.</li>
+        </ul>
+    </li>
+    <li>
+            <p>Check if the request has an AMS aggregator set in the list. The aggregator hostname will be in the format <strong>$NETWORK.$DOMAIN</strong></p>
+            <p><strong>EXAMPLE:</strong> agg is essl.ams-staging.query.akadns.net. $NETWORK is ESSL, DOMAIN is ams-staging.</p>
+            <ul>
+                <li>If $DOMAIN starts with ams or is ams-staging, then it is an AMS aggregator. Currently, CSD does not take prewarming requests for AMS aggregators - you can reply back to the requestor with the following:</li>
+                <blockquote>
+                    <p>The process for AMS prewarms are automated. Emails are regularly sent to query-slap@akamai.com as Subject: Query2 prewarm changes for AMS. Query Ops is responsible for pushing these prewarms.</p>
+                    <p>Confluence link: <a href="https://collaborate.akamai.com/confluence/display/DDC/Query2+How+to+Change+Prewarm+Tables">Query2 How to Change Prewarm Tables</a></p>
+                </blockquote>
+            </ul>
+        </li>
+        <li>
+            <p>For other aggregators, run safety checks against the network aggregator. Check with the Tier3 over the webex channel if you are unable to identify the network.</p>
+            <ol>
+                <li>
+                    <p><strong>Safety check 1:</strong> <strong>Rows:</strong> should not exceed <strong>1500000</strong>:</p>
+                    <p><strong>NOTE:</strong> CSD will no longer need approval from the Query2 team on prewarming tables that are larger than 200k. Please only escalate for approvals for prewarm requests of tables that are over 1.5 million rows in size on aggsets that are in the <a href="https://collaborate.akamai.com/confluence/pages/viewpage.action?spaceKey=DDC&title=Query2+hostname+to+aggset+mapping+2022">Updated Lists</a></p>
+                    <pre><code>agg $NETWORK 'select COUNT(*) from $TABLE_NAME';</code></pre>
+                    <ul>
+                        <li>If you see the higher number, reply-all and send an email to query-help@akamai.com cc'in query-ops-esc@akamai.com for approval with the following output.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Safety check 2:</strong> Run the following query and check to see if it <strong>returns</strong> any rows.</p>
+                    <pre><code>agg $NETWORK 'select viewname from _views where viewname = "$TABLE_NAME"';</code></pre>
+                    <ul>
+                        <li>If any rows are returned, then it’s a view and <strong>can’t</strong> be prewarmed. Run the below query to get the tables that make up the view:</li>
+                        <pre><code>agg $NETWORK "LIST TABLES SELECT * FROM $TABLE_NAME"</code></pre>
+                        <li>Reply-all to send an email to the <strong>requester</strong>, cc'in query-ops-esc@akamai.com &amp; query-help@akamai.com saying it cannot be prewarmed and a new request needs to be opened by the requestor for prewarming the tables that make up the view.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Safety check 3:</strong> Run the following query to check capitalization. Tablenames used for prewarming are case sensitive. Use the exact tablenames returned by the query below:</p>
+                    <pre><code>agg $NETWORK "LIST TABLES SELECT * FROM $TABLE_NAME"</code></pre>
+                </li>
+            </ol>
+        </li>
+        <li>
+            <p>Go to: <a href="#query2_update">MITIGATE: Query2 Update Procedure section</a>.</p>
+        </li>
+    </ol>
+</body>

@@ -1,7 +1,6 @@
-<!-- FILEPATH: /Users/jlomba/Jason/Akamai/CSD/3829/repair.html -->
-<div class="caution-banner">Do Not Run CDP Commands on FF/ESSL; Assign the ticket to the PREs</a> and <a href="https://www.nocc.akamai.com/elist/?mode=home_liaisons">contact</a> them.
-
-</div>
+<h3>Do Not Run CDP Commands on FF/ESSL; Assign the ticket to the PREs</a> and <a href="https://www.nocc.akamai.com/elist/?mode=home_liaisons">contact</a> them.
+</h3>
+<br>
 <div><p class="note" style="text-align:center"><b>Note:</b> If this alert is for <strong>CDP pre</strong>: Contact the <a href="https://www.nocc.akamai.com/elist/?mode=home_liaisons">PREs</a> for the network (<code><!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]--></code>) and confirm it is safe to run this procedure.</p>
 </div>
 
@@ -13,37 +12,13 @@
 
 <blockquote class="email">[<!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]-->] CDP post-push is running; if this release updated the configuration file for the network, you may see "Down Machine" and "Down Region" alerts for this network which fire in the next 30-60 minutes which will clear over the next 2-3 hours. Shift leads should consider opening an install ticket if this occurs, though any alerts that persist three hours from the time the CDP post-push is completed in <!--[VAR]ad_single_linked_ticket-->$TICKET<!--[ENDVAR]--> should be worked as normal, and any associated install ticket(s) should be closed.
 </blockquote>
-
-<li>If the command completed successfully, but the alert did not clear, go to the next section.</li>
-<ul><li>If the alert has clear, STOP HERE</li></ul>
-
-<li> Tell RCMS that CDP has been pushed.</li>
-<pre>rcms_tool install-manifest flag-cdp --name <!--[VAR]ad_sqc_install_label_key-->$INSTALL_LABEL<!--[ENDVAR]--> --<!--[VAR]ad_sqc_rcms_tool_arg-->$RCMS_TOOL_ARG<!--[ENDVAR]--></pre>
-
-<li>Email the [PREs](/elist/?mode=home_liaisons) for (<!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]-->) and [rcms-help](/elist/?g_id=660) and notify them that you had to run `rcms_tool` manually.  Normally `cdp-push` should run this automatically.<ul><li>The alert should clear within 1 hour.  If it does not, or if the <strong>rcms_tool</strong> output indicated failure, <a href="https://www.nocc.akamai.com/elist/?mode=home_liaisons">escalate via email to the [PREs]</a> for (<!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]-->).</li></ul>
-
+<li>
+Tell RCMS that CDP has been pushed.</li></ul>
+<ul><pre>rcms_tool install-manifest flag-cdp --name <!--[VAR]ad_sqc_install_label_key-->$INSTALL_LABEL<!--[ENDVAR]--> --<!--[VAR]ad_sqc_rcms_tool_arg-->$RCMS_TOOL_ARG<!--[ENDVAR]--></pre>
+    <li><summary>Wait 1 Hour: If the command completed successfully, but the alert did not clear</summary>
+<ul><li> Send and email to <a href=https://www.nocc.akamai.com/elist/?g_id=660>[rcms-help]</a> and the <!--[VAR]ad_sqc_network_key-->$NETWORK<!--[ENDVAR]--> PREs <a href="https://www.nocc.akamai.com/elist/?mode=home_liaisons"> via email</a> and notify them that you had to run `rcms_tool` manually.  Normally `cdp-push` should run this automatically.</li></ul>
+</ul>
 <style> 
-    .banner {
-        text-align: center; 
-        font-size:larger; 
-        background-color: darkorange; 
-        color: black; 
-        padding: 4px; 
-        font-weight:bold;
-    }
-    .caution-banner{
-        text-align: center; 
-        font-size:larger; 
-        background-color: red; 
-        color: white; 
-        padding: 4px; 
-        font-weight:bold"
-    }
-    code{
-        background-color:#A7C7E7; 
-        color: red; 
-        width:fit-content;
-    }
     .note {
         text-align: center; 
         width:fit-content;
@@ -51,27 +26,25 @@
         color: black; 
         padding: 4px; 
     
-    }
+    } 
     .email{
         background-color:gainsboro; 
         padding: 2px; 
         text-align: justify;
     }
-    
-    
-    .links {
-        width: fit-content;
-        display: flex;
-        padding-left: 1px;
-        font-size: 14px;
-        width: fit-content;
-            }
-    .links a {
-        color: darkblue;
-        width: fit-content;
-        text-align: left;
-        display: flex;
-        padding-left: 1px;
+    summary{
+        color:darkblue;
+        text-align: center; 
+        color:#e31c3d;  
+        font-weight:bold;
+        display:flex
+    }   
+
+    h3{
+        color:darkblue;
         }
-        
-    </style>   
+    code {
+        background-color:#fad980;
+        color:darkblue;
+    }
+</style>   

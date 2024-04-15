@@ -1,0 +1,86 @@
+<ol>
+    <li>See if the ExtReq has the following fields and note them in the ticket.</li>
+    <table>
+        <tr>
+            <th><strong>Value</strong></th>
+            <th><strong> Variable</strong></th>
+            <th><strong>Example</strong></th>
+        </tr>
+        <tr>
+            <td><strong>Table Name</strong></td>
+            <td>$TABLE_NAME</td>
+            <td>table_swans_rolls</td>
+        </tr>
+        <tr>
+            <td><strong>$AGG_NAME_FQDN,</strong></td>
+            <td>$AGG_NAME_FQDN</td>
+            <td>4000</td>
+        </tr>     
+        <tr>
+            <td><strong>Rows</strong></td>
+            <td></td>
+            <td>4000</td>
+        </tr>
+        <tr>
+            <td><strong>Aggregator Name</strong></td>
+            <td>$aggregator_name</td>
+            <td>ddc.nocc.query.akadns.net</td>
+        </tr>
+        <tr>
+            <td><strong>Used by the following application(s):</strong></td>
+            <td>$APP_NAME</td>
+            <td>app_name</td>
+        </tr>
+        <tr>
+            <td><strong>Used by the following group(s):</strong></td>
+            <td>$GROUP_NAME</td>
+            <td>group_name</td>
+        </tr>
+    </table>
+    <ul>
+    <li>If there are any doubts or questions, escalate to Tier3 over the webex channel.</li>
+    <li>Go to: <a href="#t2client">MITIGATE: CSD Client Configuration</a></li>
+    </ul>
+</ol>
+
+
+<style>
+   
+ 
+    table {
+        width: fit-content;
+        border-collapse: collapse;
+        display: flex; /* Added flex */
+        flex-wrap: wrap; /* Added wrap */
+        justify-content: center; /* Added center */
+              
+    }
+    th {
+        background-color: #adabab;
+        font-weight: bold;
+        text-align: center ;
+        width: fit-content;
+
+    }
+    td{
+        padding:2px;
+    }
+    tr:nth-child(odd) {
+        background-color: #e5e4e4;
+        width: fit-content;
+        
+    }
+ td:nth-child(1) {
+        width: fit-content;
+        text-align:left;
+    }
+td:nth-child(n+2) {
+        width: fit-content;
+        text-align:center;
+    }
+    tr:nth-child(even) {
+        background-color: #ffffff;
+        width: fit-content;
+
+    }
+</style>

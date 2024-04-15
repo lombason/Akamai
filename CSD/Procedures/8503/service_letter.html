@@ -1,0 +1,90 @@
+<form name="form1" id="form1" action="/action_page.php">
+ GEO: <select name="subject" id="subject">
+    <option value="" selected="selected">Select subject</option>
+  </select>
+  <br><br>
+  Service Letter: <select name="topic" id="topic">
+    <option value="" selected="selected">Please select subject first</option>
+  </select>
+  <br><br>
+  Chapters: <select name="chapter" id="chapter">
+    <option value="" selected="selected">Please select topic first</option>
+  </select>
+  <br><br>
+  <input type="submit" value="Submit">
+</form>
+
+
+
+<table class="variables" >
+    <thead>
+        <tr>
+            <th>Variables</th>
+            <th>Advertised As</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>$bucket_name</td>
+            <td>the name of the bucket given</td>
+        </tr>
+        <tr>
+            <td>$cpcodeN</td>
+            <td> keytype property; if keytype is undefined, VelvetRope will assume that the value is cpcode</td>
+        </tr>
+        <tr>
+            <td> $footprintN</td>
+            <td>keytype property;bucket cannot have a resource of bits, flits, or origin_load </td>
+            <td>keytype property;bucket cannot have a resource of bits, flits, or origin_load </td>
+        </tr>
+        <tr>
+            <td>SubType</td>
+            <td> Deconstruct Partial <em style="color: brown;">(if applicable)</em></td>
+        </tr>
+        <tr >
+            <td>Wake Up Date</td>
+            <td>*BLANK*</td>
+        </tr>
+        <tr>
+            <td>Delegated Owner</td>
+            <td>Config Queue SYSOPS</td>
+        </tr>
+        <tr>
+            <td>Update Activity</td>
+            <td>TODO</td>
+        </tr>
+        <tr>
+            <td>Abstract</td>
+            <td>SYSOPS: Please deconstruct IPs in the configuration file</td>
+        </tr>
+    </tbody>
+</table>
+
+<style>
+.variables {
+    border-color:aliceblue;
+    margin: 25px ;
+    font-size: 0.9em;
+    min-width: 400px;
+    box-shadow: 0 0 20px lightslategray;
+    align-items: center;
+    }
+.variables thead tr {
+    background-color: lightslategray;
+    color: black;
+    text-align: left;
+}
+.variables th, .variables tbody td {
+    text-align: center;
+}
+.variables tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.variables tbody tr:nth-of-type(even) {
+    background-color: lightgray;
+}
+
+.variables tbody tr:last-of-type {
+    border-bottom: 2px solid aliceblue;
+}</style>

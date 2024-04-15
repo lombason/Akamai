@@ -11,4 +11,4 @@ To specify the location of the cert file:
 /Applications/Monocle.app/Contents/Resources/settings
 
 common.pubcookie_cert_file and 
-common.akamai_cert_file 
+common.akamai_cert_file ––
